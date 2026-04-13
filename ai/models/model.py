@@ -899,8 +899,9 @@ def get_coordinates(district):
     return lat, lon
 
 import requests
+import os
 
-API_KEY = "14606d36ac5c4be8b72ad3603c4cce07Y"
+API_KEY = os.getenv("OPENWEATHERMAP_API_KEY", "your_api_key")
 
 def get_weather(lat, lon):
 
@@ -958,10 +959,11 @@ def agrosahyadri_predict(district):
     }
 
 import requests
+import os
 
 def get_weather(lat, lon):
 
-    API_KEY = "ee7a85405ec7f6b379e531fc71ba41bf"
+    API_KEY = os.getenv("OPENWEATHERMAP_API_KEY", "your_api_key")
 
     url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API_KEY}&units=metric"
 
