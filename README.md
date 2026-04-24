@@ -326,15 +326,6 @@ Full API docs: See [BACKEND.md](BACKEND.md)
 
 More details: See [AI.md](AI.md)
 
----
-
-## 🐳 Docker Deployment
-
-### Run with Docker Compose
-```bash
-docker-compose up --build
-```
-
 This starts:
 - Backend: http://localhost:8000
 - Frontend: http://localhost:3000
@@ -387,26 +378,6 @@ VITE_FIREBASE_CONFIG=your_firebase_config
 - Profile statistics
 
 ---
-
-## 🎓 Model Training
-
-### To Retrain Models
-```bash
-cd ai
-python train_models.py
-```
-
-This script:
-1. Loads training data
-2. Trains 5 ML algorithms
-3. Compares accuracy
-4. Saves best model
-5. Generates 11 pickle files
-
-See [AI.md](AI.md) for details on the training pipeline.
-
----
-
 ## 🧪 Testing
 
 ### Backend Tests
@@ -420,28 +391,6 @@ pytest tests/
 cd frontend
 npm test
 ```
-
----
-
-## 🚀 Deployment Options
-
-### Option 1: Local Development
-```bash
-./setup.bat              # Windows
-./setup.sh               # Linux/Mac
-```
-
-### Option 2: Docker Compose
-```bash
-docker-compose up --build
-```
-
-### Option 3: Cloud Deployment
-- **Azure:** App Service + PostgreSQL + Container Registry
-- **AWS:** EC2 + RDS + ECS
-- **GCP:** Cloud Run + Cloud SQL
-
-See [BACKEND.md](BACKEND.md) for deployment details.
 
 ---
 
@@ -544,46 +493,26 @@ See detailed troubleshooting in [FRONTEND.md](FRONTEND.md), [BACKEND.md](BACKEND
 4. Submit pull request
 5. Code review required
 
----
-
-## 📚 Additional Resources
-
-- **Scikit-learn:** https://scikit-learn.org/
-- **FastAPI:** https://fastapi.tiangolo.com/
-- **React:** https://react.dev/
-- **PostgreSQL:** https://www.postgresql.org/
-
----
-
-## 📞 Support & Contact
-
-- **Issues:** GitHub Issues
-- **Documentation:** See FRONTEND.md, BACKEND.md, AI.md
-- **Questions:** Check troubleshooting sections
-
----
-
 ## 📜 License
 
 MIT License - Feel free to use for educational & commercial purposes.
 
----
-
-## ✅ Quick Checklist
-
-- [x] ML models trained (99% accuracy)
-- [x] Backend API endpoints working
-- [x] Frontend UI complete
-- [x] Authentication implemented
-- [x] Weather integration done
-- [x] Docker setup complete
-- [x] Documentation comprehensive
-- [x] Model inference working
-
----
-
-**Last Updated:** 2024  
+**Last Updated:** 2026 
 **Version:** 1.0.0  
 **Status:** Production Ready ✅
 
 🌾 Empowering Maharashtra farmers with AI-driven agriculture 🚀
+
+Output
+<img width="1910" height="916" alt="Screenshot 2026-04-18 101943" src="https://github.com/user-attachments/assets/7a982bb4-aa87-40eb-a32a-7a98a8095bf9" />
+<img width="1919" height="927" alt="Screenshot 2026-04-18 102055" src="https://github.com/user-attachments/assets/9ae9f647-3e18-42fe-a5e5-07d23f40f3bd" />
+<img width="1919" height="919" alt="Screenshot 2026-04-18 102235" src="https://github.com/user-attachments/assets/3aa4ebdd-1861-43fa-a0a4-f7f590f4594c" />
+<img width="1891" height="924" alt="Screenshot 2026-04-18 102307" src="https://github.com/user-attachments/assets/417757ca-c5cd-4bff-ae39-ab21da51d216" />
+<img width="1918" height="914" alt="Screenshot 2026-04-18 113917" src="https://github.com/user-attachments/assets/4cc0d0bc-6fdb-41c2-8512-add3077cc985" />
+<img width="1883" height="920" alt="Screenshot 2026-04-18 103851" src="https://github.com/user-attachments/assets/3f7fe4b1-c399-4f88-bcab-d8a43a0a6f35" />
+
+
+
+
+
+
