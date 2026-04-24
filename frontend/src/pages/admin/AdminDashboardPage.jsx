@@ -114,10 +114,16 @@ const AdminDashboardPage = ({ onNavigate }) => {
     setDeleteModal({ isOpen: false, farmer: null });
   };
 
+  const handleNavigate = (page) => {
+    if (onNavigate) {
+      onNavigate(page);
+    }
+  };
+
   const filteredFarmers = farmers.filter((farmer) => {
     const matchesSearch = 
-      farmer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      farmer.phone.includes(searchTerm);
+      (farmer.name && farmer.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (farmer.phone && farmer.phone.includes(searchTerm));
     
     if (activeTab === 'verified') return matchesSearch && farmer.verified;
     if (activeTab === 'pending') return matchesSearch && !farmer.verified;
@@ -126,18 +132,18 @@ const AdminDashboardPage = ({ onNavigate }) => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex items-center justify-center h-screen bg-transparent backdrop-blur-sm">
         <div className="text-center">
-          <p className="text-2xl font-bold text-gray-800 dark:text-gray-100">⏳ Loading Dashboard...</p>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Please wait while we fetch your data</p>
+          <p className="text-2xl font-bold text-white">⏳ Loading Dashboard...</p>
+          <p className="text-gray-300 mt-2">Please wait while we fetch your data</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
-      <Sidebar currentPage="admin" onNavigate={onNavigate} userName={userName} />
+    <div className="flex h-screen admin-page">
+      <Sidebar currentPage="admin" onNavigate={handleNavigate} userName={userName} />
       
       <div className="flex-1 overflow-auto">
         <div className="p-8">
@@ -153,13 +159,12 @@ const AdminDashboardPage = ({ onNavigate }) => {
           )}
 
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100">
-              👨‍💼 {getTranslation(language, 'adminDashboard')}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300 text-lg mt-2">
+          <div className="page-header mb-8">
+            <h1 className="page-title">{getTranslation(language, 'adminDashboard')}</h1>
+            <p className="page-subtitle">
               {getTranslation(language, 'welcome')}, {userName}! {getTranslation(language, 'monitorSystem')}
             </p>
+            <div className="page-divider"></div>
           </div>
 
           {/* Key Statistics Cards */}

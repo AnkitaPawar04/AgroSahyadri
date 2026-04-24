@@ -1,0 +1,248 @@
+/* ===== ADMIN PAGE CARD STYLES ===== */
+
+/* ===== LIGHT THEME (DEFAULT) ===== */
+
+/* Admin Dashboard Cards - Light Theme */
+.admin-page .card {
+  @apply bg-white border border-emerald-200 hover:border-emerald-300 hover:shadow-lg shadow-md;
+}
+
+.admin-page .card-content {
+  @apply p-6 md:p-8;
+}
+
+.admin-page .stat-card {
+  @apply bg-white border border-emerald-200 hover:border-emerald-300 hover:shadow-lg shadow-md;
+}
+
+.admin-page .stat-value {
+  @apply text-3xl font-bold text-emerald-600;
+}
+
+.admin-page .stat-label {
+  @apply text-sm text-gray-600 font-semibold;
+}
+
+/* Admin Info Boxes - Light Theme */
+.admin-page .info-box-blue {
+  @apply bg-blue-50 border-blue-200 text-blue-800;
+}
+
+.admin-page .info-box-green {
+  @apply bg-green-50 border-green-200 text-green-800;
+}
+
+.admin-page .info-box-red {
+  @apply bg-red-50 border-red-200 text-red-800;
+}
+
+.admin-page .info-box-yellow {
+  @apply bg-yellow-50 border-yellow-200 text-yellow-800;
+}
+
+/* Admin Form Fields - Light Theme */
+.admin-page .input-field {
+  @apply bg-white border-gray-300 text-gray-900 placeholder-gray-500;
+}
+
+.admin-page .input-field:focus {
+  @apply border-emerald-500 ring-emerald-200;
+}
+
+.admin-page .select-field {
+  @apply bg-white border-gray-300 text-gray-900;
+}
+
+.admin-page .select-field:focus {
+  @apply border-emerald-500;
+}
+
+/* Admin Buttons - Light Theme */
+.admin-page .btn-primary {
+  @apply bg-emerald-600 hover:bg-emerald-700 text-white;
+}
+
+.admin-page .btn-secondary {
+  @apply bg-gray-200 hover:bg-gray-300 text-gray-800 border border-gray-300;
+}
+
+/* Admin Text Colors - Light Theme */
+.admin-page h1,
+.admin-page h2,
+.admin-page h3,
+.admin-page h4,
+.admin-page h5,
+.admin-page h6 {
+  @apply text-gray-800;
+}
+
+.admin-page p {
+  @apply text-gray-600;
+}
+
+/* Special accent colors for charts - Light Theme */
+.admin-page .text-blue-600 {
+  @apply text-emerald-600;
+}
+
+.admin-page .text-purple-600 {
+  @apply text-emerald-600;
+}
+
+/* Table Styles - Light Theme */
+.admin-page table {
+  @apply w-full;
+}
+
+.admin-page thead {
+  @apply bg-emerald-50;
+}
+
+.admin-page thead th {
+  @apply px-6 py-3 text-left font-semibold text-gray-800;
+}
+
+.admin-page tbody tr {
+  @apply border-t border-gray-200 hover:bg-gray-50;
+}
+
+.admin-page tbody td {
+  @apply px-6 py-4 text-gray-700;
+}
+
+.admin-page tbody a {
+  @apply text-emerald-600 hover:underline;
+}
+
+/* ===== PAGE BACKGROUNDS ===== */
+
+/* Light Theme - Default */
+.admin-page {
+  @apply bg-gray-50;
+}
+
+.admin-page .flex-1 {
+  @apply bg-gray-50;
+}
+
+/* Card containers styling for both themes */
+.admin-page .card {
+  @apply bg-white border border-emerald-200 hover:border-emerald-300 hover:shadow-lg shadow-md;
+}
+
+.dark .admin-page .card {
+  @apply bg-slate-800/70 backdrop-blur-sm border border-emerald-700/50 hover:border-emerald-600/70 hover:bg-slate-800/90;
+}
+
+/* Dark Theme */
+.dark .admin-page {
+  @apply bg-transparent;
+}
+
+.dark .admin-page .flex-1 {
+  @apply bg-transparent backdrop-blur-sm;
+}
+
+/* Admin Dashboard Cards - Dark Theme */
+.dark .admin-page .card {
+  @apply bg-slate-800/70 backdrop-blur-sm border border-emerald-700/50 hover:border-emerald-600/70 hover:bg-slate-800/90;
+}
+
+.dark .admin-page .stat-card {
+  @apply bg-gradient-to-br from-slate-800/70 to-slate-700/70 backdrop-blur-sm border border-emerald-700/50 hover:border-emerald-600/70 hover:bg-gradient-to-br hover:from-slate-800/90 hover:to-slate-700/90;
+}
+
+.dark .admin-page .stat-value {
+  @apply text-3xl font-bold text-emerald-400;
+}
+
+.dark .admin-page .stat-label {
+  @apply text-sm text-slate-300 font-semibold;
+}
+
+/* Admin Info Boxes - Dark Theme */
+.dark .admin-page .info-box-blue {
+  @apply bg-emerald-500/20 border-emerald-500/40 text-emerald-200;
+}
+
+.dark .admin-page .info-box-green {
+  @apply bg-green-500/20 border-green-500/40 text-green-200;
+}
+
+.dark .admin-page .info-box-red {
+  @apply bg-red-500/20 border-red-500/40 text-red-200;
+}
+
+.dark .admin-page .info-box-yellow {
+  @apply bg-yellow-500/20 border-yellow-500/40 text-yellow-200;
+}
+
+/* Admin Form Fields - Dark Theme */
+.dark .admin-page .input-field {
+  @apply bg-slate-700/60 backdrop-blur-sm border-emerald-600/50 hover:border-emerald-500/70 text-white placeholder-slate-400;
+}
+
+.dark .admin-page .input-field:focus {
+  @apply border-emerald-500/70 ring-emerald-500/30;
+}
+
+.dark .admin-page .select-field {
+  @apply bg-slate-700/60 backdrop-blur-sm border-emerald-600/50 hover:border-emerald-500/70 text-white;
+}
+
+.dark .admin-page .select-field:focus {
+  @apply border-emerald-500/70;
+}
+
+/* Admin Buttons - Dark Theme */
+.dark .admin-page .btn-primary {
+  @apply bg-emerald-600 hover:bg-emerald-700 text-white;
+}
+
+.dark .admin-page .btn-secondary {
+  @apply bg-slate-700 hover:bg-slate-600 text-white border border-emerald-600/50;
+}
+
+/* Admin Text Colors - Dark Theme */
+.dark .admin-page h1,
+.dark .admin-page h2,
+.dark .admin-page h3,
+.dark .admin-page h4,
+.dark .admin-page h5,
+.dark .admin-page h6 {
+  @apply text-white;
+}
+
+.dark .admin-page p {
+  @apply text-slate-300;
+}
+
+/* Special accent colors for charts - Dark Theme */
+.dark .admin-page .text-blue-600 {
+  @apply text-emerald-400;
+}
+
+.dark .admin-page .text-purple-600 {
+  @apply text-emerald-300;
+}
+
+/* Table Styles - Dark Theme */
+.dark .admin-page thead {
+  @apply bg-slate-700/60;
+}
+
+.dark .admin-page thead th {
+  @apply px-6 py-3 text-left font-semibold text-white;
+}
+
+.dark .admin-page tbody tr {
+  @apply border-t border-emerald-700/30 hover:bg-slate-700/40;
+}
+
+.dark .admin-page tbody td {
+  @apply px-6 py-4 text-slate-300;
+}
+
+.dark .admin-page tbody a {
+  @apply text-emerald-400 hover:underline;
+}

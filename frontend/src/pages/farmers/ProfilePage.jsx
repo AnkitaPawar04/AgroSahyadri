@@ -1,25 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
 import DistrictSelect from '../../components/DistrictSelect';
 import { useApp } from '../../contexts/AppContext';
 import { getTranslation, getCropTranslation, getDistrictTranslation } from '../../utils/i18n';
+import { authAPI } from '../../services/api';
+import dashboardBgVideo from './videos/dashboard.mp4';
 
 const ProfilePage = ({ onNavigate }) => {
   const { language } = useApp();
-  const [farmer, setFarmer] = useState({
-    name: 'Rajesh Kumar',
-    phone: '9876543210',
-    email: 'rajesh@agrosahyadri.com',
-    district: 'Pune',
-    village: 'Dhave',
-    farmSize: '5 acres',
-    soilType: 'Black Soil',
-    cropsGrown: ['Sugarcane', 'Jowar', 'Pulses'],
-  });
+  const [farmer, setFarmer] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState(farmer);
+  const [editData, setEditData] = useState(null);
   const [passwordData, setPasswordData] = useState({
     current: '',
     new: '',
@@ -32,10 +26,102 @@ const ProfilePage = ({ onNavigate }) => {
     new: false,
     confirm: false
   });
+  const [message, setMessage] = useState({ type: '', text: '', visible: false });
 
-  const handleSave = () => {
-    setFarmer(editData);
-    setIsEditing(false);
+  // Fetch farmer profile on mount
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        let farmerId = localStorage.getItem('farmer_id');
+        
+        // Fallback: Extract from JWT token if not in localStorage
+        if (!farmerId) {
+          const token = localStorage.getItem('access_token');
+          if (token) {
+            try {
+              // JWT format: header.payload.signature
+              const parts = token.split('.');
+              if (parts.length === 3) {
+                // Decode payload (add padding if needed)
+                const payload = parts[1];
+                const padded = payload + '='.repeat((4 - payload.length % 4) % 4);
+                const decoded = JSON.parse(atob(padded));
+                farmerId = decoded.sub;
+              }
+            } catch (e) {
+              console.error('Error decoding token:', e);
+            }
+          }
+        }
+
+        if (!farmerId) {
+          setMessage({ type: 'error', text: 'Farmer ID not found. Please logout and log back in.', visible: true });
+          setLoading(false);
+          return;
+        }
+
+        // Store farmer_id in localStorage for future use
+        if (!localStorage.getItem('farmer_id')) {
+          localStorage.setItem('farmer_id', farmerId);
+        }
+
+        const response = await authAPI.getFarmerProfile(farmerId);
+        setFarmer(response.data);
+        setEditData(response.data);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        setMessage({ type: 'error', text: 'Failed to fetch profile', visible: true });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      let farmerId = localStorage.getItem('farmer_id');
+      
+      // Fallback: Extract from JWT token if not in localStorage
+      if (!farmerId) {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+          try {
+            const parts = token.split('.');
+            if (parts.length === 3) {
+              const payload = parts[1];
+              const padded = payload + '='.repeat((4 - payload.length % 4) % 4);
+              const decoded = JSON.parse(atob(padded));
+              farmerId = decoded.sub;
+            }
+          } catch (e) {
+            console.error('Error decoding token:', e);
+          }
+        }
+      }
+
+      if (!farmerId) {
+        setMessage({ type: 'error', text: 'Farmer ID not found. Please logout and log back in.', visible: true });
+        return;
+      }
+
+      console.log('Updating profile for farmer:', farmerId, 'Data:', editData);
+      const response = await authAPI.updateFarmerProfile(farmerId, editData);
+      console.log('Update response:', response);
+      
+      // Handle both direct farmer object and nested farmer object
+      const updatedFarmer = response.data.farmer || response.data;
+      setFarmer(updatedFarmer);
+      setEditData(updatedFarmer);
+      setIsEditing(false);
+      setMessage({ type: 'success', text: 'Profile updated successfully', visible: true });
+      setTimeout(() => setMessage({ ...message, visible: false }), 3000);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      const errorMsg = error.response?.data?.detail || error.response?.data?.message || error.message || 'Failed to update profile';
+      setMessage({ type: 'error', text: errorMsg, visible: true });
+    }
   };
 
   const handleCancel = () => {
@@ -50,7 +136,7 @@ const ProfilePage = ({ onNavigate }) => {
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
-    setPasswordData({ ...passwordData, [name]: value });
+    setPasswordData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleChangePassword = () => {
@@ -82,14 +168,46 @@ const ProfilePage = ({ onNavigate }) => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar currentPage="profile" onNavigate={onNavigate} userName={farmer.name} />
+    <div className="flex h-screen bg-transparent dark:bg-transparent">
+      <Sidebar currentPage="profile" onNavigate={onNavigate} userName={farmer?.name || 'Farmer'} />
       
-      <div className="flex-1 overflow-auto">
-        <div className="p-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-8">
-            {getTranslation(language, 'myProfile')}
-          </h1>
+      <div className="flex-1 overflow-auto farm-dashboard relative">
+        {/* Background Video - Slow Cinematic Playback */}
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline 
+          className="dashboard-bg-video"
+          ref={(video) => {
+            if (video) video.playbackRate = 0.5;
+          }}
+        >
+          <source src={dashboardBgVideo} type="video/mp4" />
+        </video>
+
+        <div className="dashboard-content relative z-10">
+        <div className="p-8 relative z-10">
+          {loading ? (
+            <div className="flex items-center justify-center h-screen">
+              <div className="text-center">
+                <p className="text-2xl text-white mb-4">⏳ Loading your profile...</p>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-600 mx-auto"></div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="page-header mb-8">
+                <h1 className="page-title">Welcome back, {farmer?.first_name || farmer?.name}! 👋</h1>
+                <p className="page-subtitle">Manage your profile and account settings</p>
+                <div className="page-divider"></div>
+              </div>
+
+              {message.visible && (
+                <div className={`mb-4 p-4 rounded-lg ${message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {message.text}
+                </div>
+              )}
 
           {/* Tabs */}
           <div className="flex gap-4 mb-8 border-b border-gray-300">
@@ -97,8 +215,8 @@ const ProfilePage = ({ onNavigate }) => {
               onClick={() => setActiveTab('profile')}
               className={`pb-4 px-4 font-semibold transition ${
                 activeTab === 'profile'
-                  ? 'border-b-2 border-green-600 text-green-600'
-                  : 'text-gray-600 hover:text-gray-800'
+                  ? 'border-b-2 border-green-600 text-white'
+                  : 'text-white hover:text-white'
               }`}
             >
               {getTranslation(language, 'farmerInformation')}
@@ -107,8 +225,8 @@ const ProfilePage = ({ onNavigate }) => {
               onClick={() => setActiveTab('password')}
               className={`pb-4 px-4 font-semibold transition ${
                 activeTab === 'password'
-                  ? 'border-b-2 border-green-600 text-green-600'
-                  : 'text-gray-600 hover:text-gray-800'
+                  ? 'border-b-2 border-green-600 text-white'
+                  : 'text-white hover:text-white'
               }`}
             >
               {getTranslation(language, 'changePassword')}
@@ -141,13 +259,14 @@ const ProfilePage = ({ onNavigate }) => {
                       {isEditing ? (
                         <input
                           type="text"
-                          name="name"
-                          value={editData.name}
+                          name="first_name"
+                          value={editData?.first_name || ''}
                           onChange={handleChange}
-                          className="input-field"
+                          placeholder="First Name"
+                          className="input-field mb-2"
                         />
                       ) : (
-                        <p className="text-lg text-gray-800 dark:text-gray-100">{farmer.name}</p>
+                        <p className="text-lg text-gray-800 dark:text-gray-100">{farmer?.name || 'Not provided'}</p>
                       )}
                     </div>
 
@@ -156,7 +275,7 @@ const ProfilePage = ({ onNavigate }) => {
                       <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
                         {getTranslation(language, 'phoneNumber')}
                       </label>
-                      <p className="text-lg text-gray-800 dark:text-gray-100">{farmer.phone}</p>
+                      <p className="text-lg text-gray-800 dark:text-gray-100">{farmer?.phone_number || 'Not provided'}</p>
                     </div>
 
                     {/* Email */}
@@ -168,12 +287,12 @@ const ProfilePage = ({ onNavigate }) => {
                         <input
                           type="email"
                           name="email"
-                          value={editData.email}
+                          value={editData?.email || ''}
                           onChange={handleChange}
                           className="input-field"
                         />
                       ) : (
-                        <p className="text-lg text-gray-800 dark:text-gray-100">{farmer.email}</p>
+                        <p className="text-lg text-gray-800 dark:text-gray-100">{farmer?.email || 'Not provided'}</p>
                       )}
                     </div>
 
@@ -184,11 +303,11 @@ const ProfilePage = ({ onNavigate }) => {
                       </label>
                       {isEditing ? (
                         <DistrictSelect
-                          value={editData.district}
+                          value={editData?.district || ''}
                           onChange={handleChange}
                         />
                       ) : (
-                        <p className="text-lg text-gray-800 dark:text-gray-100">{farmer.district}</p>
+                        <p className="text-lg text-gray-800 dark:text-gray-100">{farmer?.district || 'Not specified'}</p>
                       )}
                     </div>
 
@@ -201,12 +320,12 @@ const ProfilePage = ({ onNavigate }) => {
                         <input
                           type="text"
                           name="village"
-                          value={editData.village}
+                          value={editData?.village || ''}
                           onChange={handleChange}
                           className="input-field"
                         />
                       ) : (
-                        <p className="text-lg text-gray-800 dark:text-gray-100">{farmer.village}</p>
+                        <p className="text-lg text-gray-800 dark:text-gray-100">{farmer?.village || 'Not specified'}</p>
                       )}
                     </div>
 
@@ -215,7 +334,18 @@ const ProfilePage = ({ onNavigate }) => {
                       <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
                         {getTranslation(language, 'farmSize')}
                       </label>
-                      <p className="text-lg text-gray-800 dark:text-gray-100">{farmer.farmSize}</p>
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          name="farm_size"
+                          value={editData?.farm_size || ''}
+                          onChange={handleChange}
+                          className="input-field"
+                          placeholder="e.g., 5 acres"
+                        />
+                      ) : (
+                        <p className="text-lg text-gray-800 dark:text-gray-100">{farmer?.farm_size || 'Not specified'}</p>
+                      )}
                     </div>
 
                     {/* Soil Type */}
@@ -223,7 +353,25 @@ const ProfilePage = ({ onNavigate }) => {
                       <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
                         {getTranslation(language, 'soilType')}
                       </label>
-                      <p className="text-lg text-gray-800 dark:text-gray-100">{farmer.soilType}</p>
+                      {isEditing ? (
+                        <select
+                          name="soil_type"
+                          value={editData?.soil_type || ''}
+                          onChange={handleChange}
+                          className="input-field"
+                        >
+                          <option value="">Select Soil Type</option>
+                          <option value="Black Soil">Black Soil</option>
+                          <option value="Red Soil">Red Soil</option>
+                          <option value="Loamy Soil">Loamy Soil</option>
+                          <option value="Sandy Soil">Sandy Soil</option>
+                          <option value="Clay Soil">Clay Soil</option>
+                          <option value="Laterite Soil">Laterite Soil</option>
+                          <option value="Alluvial Soil">Alluvial Soil</option>
+                        </select>
+                      ) : (
+                        <p className="text-lg text-gray-800 dark:text-gray-100">{farmer?.soil_type || 'Not specified'}</p>
+                      )}
                     </div>
                   </div>
 
@@ -243,21 +391,6 @@ const ProfilePage = ({ onNavigate }) => {
                       </button>
                     </div>
                   )}
-                </div>
-
-                {/* Crops Grown */}
-                <div className="card card-content mt-6 hover:shadow-lg dark:hover:shadow-2xl">
-                  <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-                    🌾 {getTranslation(language, 'cropsGrown')}
-                  </h3>
-                  <div className="space-y-3">
-                    {farmer.cropsGrown.map((crop, idx) => (
-                      <div key={idx} className="flex items-center p-3 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                        <span className="inline-block w-2 h-2 bg-green-600 rounded-full mr-3"></span>
-                        <span className="text-gray-700 dark:text-gray-200">{getCropTranslation(crop, language)}</span>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
             )}
@@ -394,6 +527,9 @@ const ProfilePage = ({ onNavigate }) => {
               </div>
             </div>
           </div>
+            </>
+          )}
+        </div>
         </div>
       </div>
     </div>

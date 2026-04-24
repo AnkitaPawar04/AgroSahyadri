@@ -98,28 +98,27 @@ const AdminProfilePage = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="flex h-screen admin-page">
       <Sidebar currentPage="profile" />
       
       <div className="flex-1 overflow-auto">
         <div className="p-8">
           {message.visible && (
-            <div className={`mb-6 p-4 rounded-lg text-white font-semibold animate-pulse ${
-              message.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            <div className={`mb-6 p-4 rounded-lg text-gray-900 dark:text-white font-semibold animate-pulse ${
+              message.type === 'success' ? 'bg-green-100 dark:bg-green-500' : 'bg-red-100 dark:bg-red-500'
             }`}>
               {message.text}
             </div>
           )}
 
-          <div className="mb-12">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
-              👤 {getTranslation(language, 'adminProfilePage')}
-            </h1>
-            <p className="text-gray-600 text-lg mt-3">{getTranslation(language, 'manageAccountProfile')}</p>
+          <div className="page-header mb-12">
+            <h1 className="page-title">{getTranslation(language, 'adminProfilePage')}</h1>
+            <p className="page-subtitle">{getTranslation(language, 'manageAccountProfile')}</p>
+            <div className="page-divider"></div>
           </div>
 
           {/* Profile Card */}
-          <div className="bg-white rounded-2xl shadow-xl p-10 mb-8 border border-gray-100">
+          <div className="bg-white rounded-2xl shadow-xl p-10 mb-8 border border-emerald-200">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
               {/* Profile Photo Section */}
               <div className="flex flex-col items-center justify-start lg:col-span-1">

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Union
 from ..database.config import get_db
 from ..models.farmer import Farmer
 from ..utils.auth import hash_password, verify_password, create_access_token
@@ -30,6 +30,32 @@ class RegisterRequest(BaseModel):
     last_name: Optional[str] = None
     password: str
 
+class FarmerProfileResponse(BaseModel):
+    id: int
+    name: str
+    first_name: Optional[str]
+    last_name: Optional[str]
+    phone_number: Optional[str]
+    email: Optional[str]
+    district: Optional[str]
+    village: Optional[str]
+    farm_size: Optional[str]
+    soil_type: Optional[str]
+    latitude: Optional[float]
+    longitude: Optional[float]
+
+class UpdateProfileRequest(BaseModel):
+    phone_number: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[str] = None
+    district: Optional[str] = None
+    village: Optional[str] = None
+    farm_size: Optional[Union[str, float]] = None  # Accept both string and float
+    soil_type: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+
 class OTPResponse(BaseModel):
     message: str
     phone_number: str
@@ -38,6 +64,7 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str
     message: str
+    farmer_id: Optional[int] = None
 
 @router.post("/send-otp", response_model=OTPResponse)
 async def send_otp(request: SendOTPRequest, db: Session = Depends(get_db)):
@@ -105,7 +132,8 @@ async def verify_otp_endpoint(request: VerifyOTPRequest, db: Session = Depends(g
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "message": "Login successful"
+        "message": "Login successful",
+        "farmer_id": farmer.id
     }
 
 @router.post("/login", response_model=TokenResponse)
@@ -133,7 +161,8 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "message": "Login successful"
+        "message": "Login successful",
+        "farmer_id": farmer.id
     }
 
 @router.post("/register", response_model=TokenResponse)
@@ -182,5 +211,89 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db)):
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "message": "Registration successful"
+        "message": "Registration successful",
+        "farmer_id": farmer.id
     }
+
+@router.get("/profile/{farmer_id}", response_model=FarmerProfileResponse)
+async def get_farmer_profile(farmer_id: int, db: Session = Depends(get_db)):
+    """Get farmer's profile by ID"""
+    farmer = db.query(Farmer).filter(Farmer.id == farmer_id).first()
+    if not farmer:
+        raise HTTPException(status_code=404, detail="Farmer not found")
+    
+    return FarmerProfileResponse(
+        id=farmer.id,
+        name=farmer.name,
+        first_name=farmer.first_name,
+        last_name=farmer.last_name,
+        phone_number=farmer.phone_number,
+        email=farmer.email,
+        district=farmer.district,
+        village=farmer.village,
+        farm_size=farmer.farm_size,
+        soil_type=farmer.soil_type,
+        latitude=farmer.latitude,
+        longitude=farmer.longitude
+    )
+
+@router.put("/profile/{farmer_id}")
+async def update_farmer_profile(farmer_id: int, request: UpdateProfileRequest, db: Session = Depends(get_db)):
+    """Update farmer's profile"""
+    try:
+        farmer = db.query(Farmer).filter(Farmer.id == farmer_id).first()
+        if not farmer:
+            raise HTTPException(status_code=404, detail="Farmer not found")
+        
+        # Update fields (only if provided)
+        if request.phone_number is not None and request.phone_number != "":
+            farmer.phone_number = request.phone_number
+        if request.first_name is not None and request.first_name != "":
+            farmer.first_name = request.first_name
+        if request.last_name is not None and request.last_name != "":
+            farmer.last_name = request.last_name
+        if request.email is not None and request.email != "":
+            farmer.email = request.email
+        if request.district is not None and request.district != "":
+            farmer.district = request.district
+        if request.village is not None and request.village != "":
+            farmer.village = request.village
+        if request.farm_size is not None and request.farm_size != "":
+            # Convert to string if needed
+            farmer.farm_size = str(request.farm_size)
+        if request.soil_type is not None and request.soil_type != "":
+            farmer.soil_type = request.soil_type
+        if request.latitude is not None:
+            farmer.latitude = request.latitude
+        if request.longitude is not None:
+            farmer.longitude = request.longitude
+        
+        # Update name if first_name or last_name changed
+        if request.first_name is not None or request.last_name is not None:
+            farmer.name = f"{request.first_name or farmer.first_name or ''} {request.last_name or farmer.last_name or ''}".strip()
+        
+        db.commit()
+        db.refresh(farmer)
+        
+        return {
+            "message": "Profile updated successfully",
+            "farmer": FarmerProfileResponse(
+                id=farmer.id,
+                name=farmer.name,
+                first_name=farmer.first_name,
+                last_name=farmer.last_name,
+                phone_number=farmer.phone_number,
+                email=farmer.email,
+                district=farmer.district,
+                village=farmer.village,
+                farm_size=farmer.farm_size,
+                soil_type=farmer.soil_type,
+                latitude=farmer.latitude,
+                longitude=farmer.longitude
+            )
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error updating profile: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error updating profile: {str(e)}")

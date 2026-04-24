@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
-from .routes import auth, crop, admin, weather, soil
+from .routes import auth, crop, admin, weather, soil, irrigation
 from .database.config import Base, engine
 
 load_dotenv()
@@ -32,6 +32,7 @@ app.include_router(crop.router)
 app.include_router(admin.router)
 app.include_router(weather.router)
 app.include_router(soil.router)
+app.include_router(irrigation.router)
 
 @app.get("/")
 async def root():

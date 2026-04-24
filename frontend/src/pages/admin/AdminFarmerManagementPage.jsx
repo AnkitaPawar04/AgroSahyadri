@@ -38,7 +38,7 @@ const AdminFarmerManagementPage = () => {
   const filteredFarmers = farmers.filter((farmer) => {
     const matchesSearch = 
       farmer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      farmer.phone.includes(searchTerm);
+      (farmer.phone && farmer.phone.includes(searchTerm));
     
     if (filterStatus === 'verified') return matchesSearch && farmer.verified;
     if (filterStatus === 'pending') return matchesSearch && !farmer.verified;
@@ -70,9 +70,9 @@ const AdminFarmerManagementPage = () => {
     return (
       <div className="flex h-screen">
         <Sidebar />
-        <div className="flex-1 flex items-center justify-center bg-gray-50">
+        <div className="flex-1 flex items-center justify-center admin-page">
           <div className="text-center">
-            <p className="text-2xl font-bold text-gray-800">⏳ {getTranslation(language, 'loadingFarmers')}</p>
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">⏳ {getTranslation(language, 'loadingFarmers')}</p>
           </div>
         </div>
       </div>
@@ -80,38 +80,39 @@ const AdminFarmerManagementPage = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen admin-page">
       <Sidebar currentPage="farmers" />
       
       <div className="flex-1 overflow-auto">
         <div className="p-8">
           {message.visible && (
-            <div className={`mb-6 p-4 rounded-lg text-white font-semibold ${
-              message.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            <div className={`mb-6 p-4 rounded-lg text-gray-900 dark:text-white font-semibold ${
+              message.type === 'success' ? 'bg-green-100 dark:bg-green-500' : 'bg-red-100 dark:bg-red-500'
             }`}>
               {message.text}
             </div>
           )}
 
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-800">👥 {getTranslation(language, 'farmerManagementPage')}</h1>
-            <p className="text-gray-600 text-lg mt-2">{getTranslation(language, 'manageMonitorFarmers')}</p>
+          <div className="page-header mb-8">
+            <h1 className="page-title">{getTranslation(language, 'farmerManagementPage')}</h1>
+            <p className="page-subtitle">{getTranslation(language, 'manageMonitorFarmers')}</p>
+            <div className="page-divider"></div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="bg-white rounded-lg shadow-lg p-6 border border-emerald-200">
             <div className="flex flex-col md:flex-row gap-4 mb-6">
               <input
                 type="text"
                 placeholder={getTranslation(language, 'searchByNamePhone')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="flex-1 px-4 py-2 border border-emerald-200 dark:border-emerald-600/50 rounded-lg bg-white dark:bg-slate-700/60 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
               
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="px-4 py-2 border border-emerald-200 dark:border-emerald-600/50 rounded-lg bg-white dark:bg-slate-700/60 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               >
                 <option value="all">{getTranslation(language, 'allFarmers')} ({farmers.length})</option>
                 <option value="verified">{getTranslation(language, 'verifiedLabel')} ({farmers.filter(f => f.verified).length})</option>
@@ -121,43 +122,43 @@ const AdminFarmerManagementPage = () => {
 
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-100">
+                <thead className="bg-emerald-50 dark:bg-slate-700/60">
                   <tr>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{getTranslation(language, 'nameLabel')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{getTranslation(language, 'phoneLabel')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{getTranslation(language, 'districtLabel')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{getTranslation(language, 'statusLabel')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{getTranslation(language, 'joinedLabel')}</th>
-                    <th className="px-6 py-3 text-center font-semibold text-gray-800">{getTranslation(language, 'actionsLabel')}</th>
+                    <th className="px-6 py-3 text-left font-semibold text-gray-800 dark:text-white">{getTranslation(language, 'nameLabel')}</th>
+                    <th className="px-6 py-3 text-left font-semibold text-gray-800 dark:text-white">{getTranslation(language, 'phoneLabel')}</th>
+                    <th className="px-6 py-3 text-left font-semibold text-gray-800 dark:text-white">{getTranslation(language, 'districtLabel')}</th>
+                    <th className="px-6 py-3 text-left font-semibold text-gray-800 dark:text-white">{getTranslation(language, 'statusLabel')}</th>
+                    <th className="px-6 py-3 text-left font-semibold text-gray-800 dark:text-white">{getTranslation(language, 'joinedLabel')}</th>
+                    <th className="px-6 py-3 text-center font-semibold text-gray-800 dark:text-white">{getTranslation(language, 'actionsLabel')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredFarmers.map((farmer) => (
-                    <tr key={farmer.id} className="border-t border-gray-200 hover:bg-gray-50">
-                      <td className="px-6 py-4 text-gray-800 font-medium">{farmer.name}</td>
-                      <td className="px-6 py-4 text-gray-800">
-                        <a href={`tel:${farmer.phone}`} className="text-blue-600 hover:underline">
+                    <tr key={farmer.id} className="border-t border-gray-200 dark:border-emerald-700/30 hover:bg-gray-50 dark:hover:bg-slate-700/40">
+                      <td className="px-6 py-4 text-gray-800 dark:text-white font-medium">{farmer.name}</td>
+                      <td className="px-6 py-4 text-gray-700 dark:text-slate-300">
+                        <a href={`tel:${farmer.phone}`} className="text-emerald-600 dark:text-emerald-400 hover:underline">
                           {farmer.phone}
                         </a>
                       </td>
-                      <td className="px-6 py-4 text-gray-800">{farmer.district || 'N/A'}</td>
+                      <td className="px-6 py-4 text-gray-700 dark:text-slate-300">{farmer.district || 'N/A'}</td>
                       <td className="px-6 py-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-semibold inline-block ${
                           farmer.verified
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-yellow-100 text-yellow-800'
+                            ? 'bg-green-100 text-green-800 border border-green-200 dark:bg-green-500/30 dark:text-green-200 dark:border-green-500/50'
+                            : 'bg-yellow-100 text-yellow-800 border border-yellow-200 dark:bg-yellow-500/30 dark:text-yellow-200 dark:border-yellow-500/50'
                         }`}>
                           {farmer.verified ? '✓ ' + getTranslation(language, 'verifiedLabel') : '⏳ ' + getTranslation(language, 'pendingLabel')}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">
                         {new Date(farmer.created_at).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex gap-2 justify-center">
                           <button
                             onClick={() => setViewModal({ isOpen: true, farmer })}
-                            className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
+                            className="px-3 py-1 text-xs bg-emerald-600 text-white rounded hover:bg-emerald-700"
                           >
                             👁 View
                           </button>

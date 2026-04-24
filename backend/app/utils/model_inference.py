@@ -90,8 +90,8 @@ class CropRecommendationModel:
         predicted_crop = self.label_encoder.inverse_transform([prediction_encoded])[0]
         confidence = float(np.max(prediction_probs)) * 100
         
-        # Get top 4 recommended crops to ensure we have 3 alternatives after filtering
-        top_indices = np.argsort(prediction_probs)[-4:][::-1]
+        # Get top 10 recommended crops to ensure we have enough after season filtering
+        top_indices = np.argsort(prediction_probs)[-10:][::-1]
         all_crops = [
             {
                 "crop": self.label_encoder.inverse_transform([idx])[0],
@@ -100,8 +100,8 @@ class CropRecommendationModel:
             for idx in top_indices
         ]
         
-        # Filter out the recommended crop from alternatives, keep only the next 3
-        alternative_crops = [crop for crop in all_crops if crop["crop"] != predicted_crop][:3]
+        # Filter out the recommended crop from alternatives, keep the next 10
+        alternative_crops = [crop for crop in all_crops if crop["crop"] != predicted_crop][:10]
         
         return {
             "recommended_crop": predicted_crop,

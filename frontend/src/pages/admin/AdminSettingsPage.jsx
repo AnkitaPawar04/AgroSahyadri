@@ -26,14 +26,18 @@ const AdminSettingsPage = ({ onNavigate }) => {
 
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen admin-page">
       <Sidebar currentPage="settings" onNavigate={onNavigate} userName="Admin" />
       
       <div className="flex-1 overflow-auto">
         <div className="p-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-8">
-            {getTranslation(language, 'settings')}
-          </h1>
+          <div className="page-header mb-8">
+            <h1 className="page-title">
+              {getTranslation(language, 'settings')}
+            </h1>
+            <p className="page-subtitle">Manage admin preferences and system settings</p>
+            <div className="page-divider"></div>
+          </div>
 
           {/* Tabs */}
           <div className="flex gap-4 mb-8 border-b border-gray-300">

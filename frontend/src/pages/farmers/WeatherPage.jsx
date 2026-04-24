@@ -3,58 +3,39 @@ import Sidebar from '../../components/Sidebar';
 import { useApp } from '../../contexts/AppContext';
 import { getTranslation, getDistrictTranslation } from '../../utils/i18n';
 import { weatherAPI, soilAPI } from '../../services/api';
-import { TemperatureTrendChart, RainfallChart, SoilNutrientsChart } from '../../charts/Charts';
 import useGeolocation from '../../hooks/useGeolocation';
+import dashboardBgVideo from './videos/dashboard.mp4';
 
 const WeatherPage = ({ onNavigate }) => {
   const { language } = useApp();
   const { location, getLocation, loading: locationLoading } = useGeolocation();
   const [weather, setWeather] = useState(null);
+  const [forecast, setForecast] = useState(null);
   const [soilData, setSoilData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [district, setDistrict] = useState('Pune');
 
-  // Mock analytics data
-  const temperatureData = [
-    { day: 'Mon', temp: 28 },
-    { day: 'Tue', temp: 30 },
-    { day: 'Wed', temp: 29 },
-    { day: 'Thu', temp: 32 },
-    { day: 'Fri', temp: 31 },
-    { day: 'Sat', temp: 27 },
-    { day: 'Sun', temp: 25 },
-  ];
-
-  const rainfallData = [
-    { day: 'Mon', rainfall: 5 },
-    { day: 'Tue', rainfall: 0 },
-    { day: 'Wed', rainfall: 12 },
-    { day: 'Thu', rainfall: 8 },
-    { day: 'Fri', rainfall: 3 },
-    { day: 'Sat', rainfall: 0 },
-    { day: 'Sun', rainfall: 15 },
-  ];
-
-  const mockSoilData = {
-    nitrogen: 45,
-    phosphorus: 35,
-    potassium: 58,
-    ph: 6.8,
-  };
-
   useEffect(() => {
-    if (location) {
-      fetchWeatherData(location.latitude, location.longitude);
-    }
-  }, [location]);
+    // Auto-fetch weather for default location (Pune) on page load
+    fetchWeatherData(18.5204, 73.8567); // Pune coordinates
+  }, []);
 
   const fetchWeatherData = async (lat, lon) => {
     setLoading(true);
     try {
       const weatherResponse = await weatherAPI.getCurrentWeather(lat, lon);
-      setWeather(weatherResponse.data);
+      console.log('Weather API Response:', weatherResponse);
+      // Handle both response.data and direct response
+      const weatherData = weatherResponse.data || weatherResponse;
+      setWeather(weatherData);
 
-      // Mock district based on coordinates
+      // Fetch 5-day forecast
+      const forecastResponse = await weatherAPI.getForecast(lat, lon);
+      console.log('Forecast API Response:', forecastResponse);
+      const forecastData = forecastResponse.data || forecastResponse;
+      setForecast(forecastData.forecast);
+
+      // Determine district based on coordinates
       determineDistrict(lat, lon);
     } catch (err) {
       console.error('Failed to fetch weather data:', err);
@@ -98,203 +79,136 @@ const WeatherPage = ({ onNavigate }) => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen bg-transparent dark:bg-transparent">
       <Sidebar currentPage="weather" onNavigate={onNavigate} userName="Farmer" />
       
-      <div className="flex-1 overflow-auto">
-        <div className="p-8">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-8">{getTranslation(language, 'weatherSoilInfo')}</h1>
+      <div className="flex-1 overflow-auto farm-dashboard relative">
+        {/* Background Video - Slow Cinematic Playback */}
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline 
+          className="dashboard-bg-video"
+          ref={(video) => {
+            if (video) video.playbackRate = 0.5;
+          }}
+        >
+          <source src={dashboardBgVideo} type="video/mp4" />
+        </video>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Weather Section */}
-            <div className="card card-content hover:shadow-lg">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold text-blue-700 dark:text-blue-400">🌤️ {getTranslation(language, 'weatherInfo')}</h2>
-                <button
-                  onClick={getLocation}
-                  disabled={locationLoading}
-                  className="bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-600 dark:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-sm transition btn-hover"
-                >
-                  {locationLoading ? getTranslation(language, 'loading') : getTranslation(language, 'refresh')}
-                </button>
+        <div className="dashboard-content relative z-10">
+        <div className="p-8 relative z-10">
+          {/* Top Navigation */}
+          <div className="page-header animate-fadeInUp">
+            <h1 className="page-title">Atmospheric Insight</h1>
+            <p className="page-subtitle">Real-time weather monitoring for Sahyadri Valley, Maharashtra</p>
+            <div className="page-divider"></div>
+          </div>
+
+        {/* Weather Card */}
+        <section className="grid grid-cols-1 gap-8 mb-10 animate-fadeInUp" style={{animationDelay: '0.1s'}}>
+          {/* Current Weather Card */}
+          <div className="farm-card bg-white dark:bg-gray-800 rounded-2xl shadow-xl border-4 border-blue-200 dark:border-blue-700 overflow-hidden transition-shadow duration-300">
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white">
+              <h2 className="text-3xl font-bold flex items-center gap-3">📊 Current Condition</h2>
+              <p className="text-blue-100 mt-2 text-lg">Real-time atmospheric data for your location</p>
+            </div>
+            
+            <div className="p-8">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <button
+                    onClick={getLocation}
+                    disabled={locationLoading}
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-xl mb-6 transition disabled:opacity-50 shadow-lg text-lg"
+                  >
+                    {locationLoading ? '📡 Detecting Location...' : '🔄 Refresh Data'}
+                  </button>
+                </div>
               </div>
 
               {weather ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-blue-50 dark:bg-blue-900 rounded-lg p-4 hover:shadow-md transition">
-                      <p className="text-sm text-gray-600 dark:text-gray-300 font-semibold">{getTranslation(language, 'temperature')}</p>
-                      <p className="text-3xl font-bold text-blue-600 dark:text-blue-300">{weather.temperature}°C</p>
+                <div className="bg-gradient-to-br from-blue-50 dark:from-gray-700 to-white dark:to-gray-800 rounded-2xl p-8 text-center border-2 border-blue-100 dark:border-blue-600">
+                  <p className="text-blue-700 dark:text-blue-300 text-sm mb-2 font-bold">CURRENT CONDITIONS</p>
+                  <p className="text-6xl font-bold text-gray-900 dark:text-white">{weather.temperature}°C</p>
+                  <p className="text-xl text-gray-700 dark:text-gray-300 font-semibold mt-4">{weather.description}</p>
+                  
+                  {/* Weather Details Grid */}
+                  <div className="grid grid-cols-3 gap-4 mt-8">
+                    <div className="bg-blue-100 dark:bg-blue-900/30 rounded-xl p-4 border-l-4 border-blue-600">
+                      <p className="text-blue-700 dark:text-blue-300 text-sm font-semibold">💧 Humidity</p>
+                      <p className="text-3xl font-bold text-blue-800 dark:text-blue-200 mt-2">{weather.humidity}%</p>
                     </div>
-                    <div className="bg-blue-50 dark:bg-blue-900 rounded-lg p-4 hover:shadow-md transition">
-                      <p className="text-sm text-gray-600 dark:text-gray-300 font-semibold">{getTranslation(language, 'humidity')}</p>
-                      <p className="text-3xl font-bold text-blue-600 dark:text-blue-300">{weather.humidity}%</p>
+                    <div className="bg-cyan-100 dark:bg-cyan-900/30 rounded-xl p-4 border-l-4 border-cyan-600">
+                      <p className="text-cyan-700 dark:text-cyan-300 text-sm font-semibold">🌧️ Rainfall</p>
+                      <p className="text-3xl font-bold text-cyan-800 dark:text-cyan-200 mt-2">{weather.rainfall}mm</p>
                     </div>
-                    <div className="bg-blue-50 dark:bg-blue-900 rounded-lg p-4 hover:shadow-md transition">
-                      <p className="text-sm text-gray-600 dark:text-gray-300 font-semibold">{getTranslation(language, 'rainfall')}</p>
-                      <p className="text-3xl font-bold text-blue-600 dark:text-blue-300">{weather.rainfall}mm</p>
+                    <div className="bg-indigo-100 dark:bg-indigo-900/30 rounded-xl p-4 border-l-4 border-indigo-600">
+                      <p className="text-indigo-700 dark:text-indigo-300 text-sm font-semibold">📍 Location</p>
+                      <p className="text-3xl font-bold text-indigo-800 dark:text-indigo-200 mt-2">{district}</p>
                     </div>
-                    <div className="bg-blue-50 dark:bg-blue-900 rounded-lg p-4 hover:shadow-md transition">
-                      <p className="text-sm text-gray-600 dark:text-gray-300 font-semibold">{getTranslation(language, 'condition')}</p>
-                      <p className="text-lg font-bold text-blue-600 dark:text-blue-300 capitalize">{weather.description}</p>
-                    </div>
-                  </div>
-
-                  <div className="info-box info-box-yellow">
-                    <p className="text-sm"><span className="font-bold">{getTranslation(language, 'recommendation')}:</span></p>
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                  <p>{getTranslation(language, 'clickRefresh')}</p>
+                <div className="text-center py-12 bg-gray-50 dark:bg-gray-700 rounded-2xl">
+                  <p className="text-gray-700 dark:text-gray-300 text-lg font-semibold">📍 Click 'Refresh Data' to fetch weather information</p>
                 </div>
               )}
             </div>
-
-            {/* Soil Section */}
-            <div className="card card-content hover:shadow-lg">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold text-green-700 dark:text-green-400">🌱 {getTranslation(language, 'soilData')}</h2>
-                <select
-                  value={district}
-                  onChange={(e) => {
-                    setDistrict(e.target.value);
-                    fetchSoilData(e.target.value);
-                  }}
-                  className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                >
-                  <option>Pune</option>
-                  <option>Satara</option>
-                  <option>Kolhapur</option>
-                  <option>Nashik</option>
-                  <option>Solapur</option>
-                </select>
-              </div>
-
-              {soilData ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-green-50 dark:bg-green-900 rounded-lg p-4 hover:shadow-md transition">
-                      <p className="text-sm text-gray-600 dark:text-gray-300 font-semibold">{getTranslation(language, 'nitrogen')} </p>
-                      <p className="text-3xl font-bold text-green-600 dark:text-green-300">{soilData.nitrogen}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{getTranslation(language, 'mgPerKg')}</p>
-                    </div>
-                    <div className="bg-green-50 dark:bg-green-900 rounded-lg p-4 hover:shadow-md transition">
-                      <p className="text-sm text-gray-600 dark:text-gray-300 font-semibold">{getTranslation(language, 'phosphorus')} </p>
-                      <p className="text-3xl font-bold text-green-600 dark:text-green-300">{soilData.phosphorus}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{getTranslation(language, 'mgPerKg')}</p>
-                    </div>
-                    <div className="bg-green-50 dark:bg-green-900 rounded-lg p-4 hover:shadow-md transition">
-                      <p className="text-sm text-gray-600 dark:text-gray-300 font-semibold">{getTranslation(language, 'potassium')} </p>
-                      <p className="text-3xl font-bold text-green-600 dark:text-green-300">{soilData.potassium}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{getTranslation(language, 'mgPerKg')}</p>
-                    </div>
-                    <div className="bg-green-50 dark:bg-green-900 rounded-lg p-4 hover:shadow-md transition">
-                      <p className="text-sm text-gray-600 dark:text-gray-300 font-semibold">{getTranslation(language, 'phLevel')}</p>
-                      <p className="text-3xl font-bold text-green-600 dark:text-green-300">{soilData.ph}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{getTranslation(language, 'acidityAlkalinity')}</p>
-                    </div>
-                  </div>
-
-                  <div className="info-box info-box-green">
-                    <p className="text-sm text-gray-700 dark:text-gray-200">
-                      <span className="font-bold">{getTranslation(language, 'soilStatus')}:</span>
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  onClick={handleFetchSoilData}
-                  className="w-full bg-green-600 hover:bg-green-700 dark:hover:bg-green-600 dark:bg-green-700 text-white font-bold py-3 rounded-lg mt-4 transition btn-hover"
-                >
-                  {getTranslation(language, 'loadSoilData')} {getDistrictTranslation(district, language)}
-                </button>
-              )}
-            </div>
           </div>
+        </section>
 
-          {/* Weather Forecast (Mock) */}
-          <div className="mt-6 card card-content hover:shadow-lg mb-8">
-            <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">📅 {getTranslation(language, 'next5DaysForecast')}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {[getTranslation(language, 'today'), getTranslation(language, 'tomorrow'), getTranslation(language, 'day3'), getTranslation(language, 'day4'), getTranslation(language, 'day5')].map((day, idx) => (
-                <div key={idx} className="text-center p-4 bg-blue-50 dark:bg-blue-900 rounded-lg hover:shadow-md transition">
-                  <p className="font-bold text-gray-700 dark:text-gray-200 mb-2">{day}</p>
-                  <p className="text-2xl mb-2">🌤️</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">25-28°C</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">65% humidity</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Analytics Section */}
-          <div className="mt-8">
-            <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">📊 {getTranslation(language, 'weatherSoilAnalytics')}</h2>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="card card-content hover:shadow-lg">
-                <h3 className="text-2xl font-bold text-orange-700 dark:text-orange-400 mb-4">🌡️ {getTranslation(language, 'temperatureTrendChart')}</h3>
-                <div style={{ position: 'relative', height: '300px' }}>
-                  <TemperatureTrendChart data={temperatureData} />
-                </div>
-                <div className="mt-4 p-4 bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-700 rounded-lg">
-                  <p className="text-sm text-orange-800 dark:text-orange-200">
-                    📈 {getTranslation(language, 'weeklyAverageTemp')}: <span className="font-bold">29°C</span> | {getTranslation(language, 'peak')}: <span className="font-bold">32°C</span>
-                  </p>
-                </div>
+        {/* 5-Day Forecast Section */}
+        {forecast && forecast.length > 0 && (
+          <section className="mb-10 animate-fadeInUp" style={{animationDelay: '0.2s'}}>
+            <div className="farm-card bg-white dark:bg-gray-800 rounded-2xl shadow-xl border-4 border-green-200 dark:border-green-700 overflow-hidden transition-shadow duration-300">
+              <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 text-white">
+                <h2 className="text-3xl font-bold flex items-center gap-3">📅 5-Day Forecast</h2>
+                <p className="text-green-100 mt-2 text-lg">Extended outlook for your region</p>
               </div>
-
-              <div className="card card-content hover:shadow-lg">
-                <h3 className="text-2xl font-bold text-blue-700 dark:text-blue-400 mb-4">🌧️ {getTranslation(language, 'rainfallAnalysis')}</h3>
-                <div style={{ position: 'relative', height: '300px' }}>
-                  <RainfallChart data={rainfallData} />
-                </div>
-                <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg">
-                  <p className="text-sm text-blue-800 dark:text-blue-200">
-                    💧 {getTranslation(language, 'totalWeeklyRainfall')}: <span className="font-bold">43mm</span> | {getTranslation(language, 'idealForCrops')}
-                  </p>
-                </div>
-              </div>
-
-              <div className="card card-content hover:shadow-lg lg:col-span-2">
-                <h3 className="text-2xl font-bold text-green-700 dark:text-green-400 mb-4">🧪 {getTranslation(language, 'soilNutrientAnalysis')}</h3>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <div style={{ position: 'relative', height: '300px' }}>
-                    <SoilNutrientsChart data={mockSoilData} />
-                  </div>
-                  <div className="space-y-4">
-                    <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 font-semibold">{getTranslation(language, 'nitrogen')}</p>
-                      <p className="text-3xl font-bold text-green-600 dark:text-green-400">{mockSoilData.nitrogen}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{getTranslation(language, 'mgPerKg')} - {getTranslation(language, 'good')}</p>
+              
+              <div className="p-8">
+                <div className="grid grid-cols-5 gap-4">
+                  {forecast.map((day, index) => (
+                    <div key={index} className="bg-gradient-to-br from-green-50 dark:from-gray-700 to-white dark:to-gray-800 rounded-xl p-4 border-2 border-green-100 dark:border-green-600 text-center transition-shadow duration-300">
+                      <p className="font-bold text-gray-800 dark:text-white text-lg">{day.day}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">{day.date}</p>
+                      
+                      <div className="mb-3">
+                        <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{day.description}</p>
+                        <div className="flex justify-around items-center mb-3">
+                          <div>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">Max</p>
+                            <p className="text-xl font-bold text-red-600">{day.temp_max}°</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">Min</p>
+                            <p className="text-xl font-bold text-blue-600">{day.temp_min}°</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="border-t border-green-100 dark:border-green-600 pt-3">
+                        <div className="flex justify-around text-xs">
+                          <div>
+                            <p className="text-gray-600 dark:text-gray-400">💧</p>
+                            <p className="font-semibold text-gray-700 dark:text-gray-300">{day.humidity}%</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 dark:text-gray-400">🌧️</p>
+                            <p className="font-semibold text-gray-700 dark:text-gray-300">{day.rainfall}mm</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 font-semibold">{getTranslation(language, 'phosphorus')}</p>
-                      <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{mockSoilData.phosphorus}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{getTranslation(language, 'mgPerKg')} - {getTranslation(language, 'adequate')}</p>
-                    </div>
-                    <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 font-semibold">{getTranslation(language, 'potassium')}</p>
-                      <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{mockSoilData.potassium}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{getTranslation(language, 'mgPerKg')} - {getTranslation(language, 'optimal')}</p>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg h-full flex flex-col justify-center">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 font-semibold mb-3">💡 {getTranslation(language, 'recommendations')}</p>
-                      <ul className="text-xs text-gray-700 dark:text-gray-300 space-y-2">
-                        <li>{getTranslation(language, 'phOptimal')}</li>
-                        <li>{getTranslation(language, 'nitrogenBalanced')}</li>
-                        <li>{getTranslation(language, 'considerK')}</li>
-                        <li>{getTranslation(language, 'moistureGood')}</li>
-                      </ul>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
-          </div>
+          </section>
+        )}
+        </div>
         </div>
       </div>
     </div>

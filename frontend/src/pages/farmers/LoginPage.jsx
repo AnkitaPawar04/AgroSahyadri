@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../../services/api';
 import authStorage from '../../services/authStorage';
+import { getTranslation } from '../../utils/i18n';
+import { AppContext } from '../../contexts/AppContext';
 
 const ADMIN_EMAIL = 'ankita.pawarr19@gmail.com'; // Admin credentials (note: double 'r')
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { language } = useContext(AppContext);
   const [isSignup, setIsSignup] = useState(false);
   const [selectedRole, setSelectedRole] = useState('farmer'); // 'admin' or 'farmer'
   const [email, setEmail] = useState('');
@@ -71,6 +74,9 @@ const LoginPage = () => {
 
         // Store token and user info
         authStorage.setToken(response.data.access_token);
+        if (response.data.farmer_id) {
+          authStorage.setFarmerId(response.data.farmer_id);
+        }
         authStorage.setUser({
           email: email,
           firstName: firstName,
@@ -149,6 +155,9 @@ const LoginPage = () => {
 
         // Store token and user info
         authStorage.setToken(response.data.access_token);
+        if (response.data.farmer_id) {
+          authStorage.setFarmerId(response.data.farmer_id);
+        }
         authStorage.setUser({
           email: email,
           role: userRole,
@@ -195,344 +204,304 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 lg:bg-white flex flex-col lg:flex-row">
-      {/* Left Side - Hero Section */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-600 via-green-700 to-green-800 flex-col justify-between p-12 text-white min-h-screen">
-        {/* Top Section */}
-        <div>
-          {/* Logo & Title */}
-          <div className="mb-10">
-            <h1 className="text-6xl font-bold mb-3">🌾 AgroSahyadri</h1>
-            <p className="text-2xl font-semibold text-green-100">
-              Empowering Maharashtra Farmers with AI
-            </p>
-            <p className="text-green-200 text-lg mt-2">
-              {getTranslation(language, 'smartCropDescription')}
-            </p>
-          </div>
-
-          {/* Feature Cards Preview */}
-          <div className="grid grid-cols-2 gap-4 mb-10">
-            {/* Weather Card */}
-            <div className="bg-white bg-opacity-15 backdrop-blur-md rounded-xl p-4 border border-white border-opacity-20 hover:bg-opacity-25 transition">
-              <p className="text-green-100 text-sm font-semibold mb-2">🌤️ Weather</p>
-              <p className="text-white text-2xl font-bold">32°C</p>
-              <p className="text-green-100 text-xs mt-1">Moderate Rain</p>
-            </div>
-
-            {/* Soil Info Card */}
-            <div className="bg-white bg-opacity-15 backdrop-blur-md rounded-xl p-4 border border-white border-opacity-20 hover:bg-opacity-25 transition">
-              <p className="text-green-100 text-sm font-semibold mb-2">🌱 Soil Health</p>
-              <p className="text-white text-2xl font-bold">pH: 6.8</p>
-              <p className="text-green-100 text-xs mt-1">Optimal State</p>
-            </div>
-
-            {/* Crop Monitoring Card */}
-            <div className="bg-white bg-opacity-15 backdrop-blur-md rounded-xl p-4 border border-white border-opacity-20 hover:bg-opacity-25 transition">
-              <p className="text-green-100 text-sm font-semibold mb-2">🥬 Crops</p>
-              <p className="text-white text-2xl font-bold">4 Active</p>
-              <p className="text-green-100 text-xs mt-1">Healthy Growth</p>
-            </div>
-
-            {/* Disease Detection Card */}
-            <div className="bg-white bg-opacity-15 backdrop-blur-md rounded-xl p-4 border border-white border-opacity-20 hover:bg-opacity-25 transition">
-              <p className="text-green-100 text-sm font-semibold mb-2">🔍 Detection</p>
-              <p className="text-white text-2xl font-bold">Safe</p>
-              <p className="text-green-100 text-xs mt-1">No Issues Found</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Section - Features & Call to Action */}
-        <div>
-          {/* Features List */}
-          <div className="mb-10 space-y-3">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">✓</span>
-              <div>
-                <p className="font-bold">{getTranslation(language, 'smartCropRecommendations')}</p>
-                <p className="text-green-100 text-sm">AI analyzes soil & weather for best crops</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">✓</span>
-              <div>
-                <p className="font-bold">Real-time Disease Detection</p>
-                <p className="text-green-100 text-sm">Computer vision identifies crop diseases early</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">✓</span>
-              <div>
-                <p className="font-bold">Weather & Soil Analytics</p>
-                <p className="text-green-100 text-sm">Live data tracking for informed decisions</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Call to Action Button & Footer */}
-          <div className="border-t border-green-500 pt-6">
-            <p className="text-green-100 text-sm mb-4">
-              {getTranslation(language, 'joinFarmers')}
-            </p>
-            <button className="w-full bg-white text-green-700 font-bold py-3 rounded-xl hover:bg-green-50 transition mb-4">
-              Learn More →
-            </button>
-            <p className="text-xs text-green-200 text-center">
-              Available as Web App & Mobile App
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Side - Login/Signup Form */}
-      <div className="w-full lg:w-1/2 bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col justify-center items-center p-6 md:p-12 min-h-screen">
-        <div className="w-full max-w-md">
-          {/* Mobile Hero Section */}
-          <div className="lg:hidden bg-gradient-to-br from-green-600 to-green-700 rounded-2xl p-8 mb-8 text-white">
-            <h1 className="text-4xl font-bold mb-2">🌾 AgroSahyadri</h1>
-            <p className="text-lg font-semibold text-green-100 mb-4">
-              Empowering Maharashtra Farmers with AI
-            </p>
-            <p className="text-green-100 text-sm mb-6">
-              {getTranslation(language, 'smartCropDescription')}
-            </p>
-          </div>
-
-          {/* Tab Switch */}
-          <div className="flex gap-3 mb-8 bg-white rounded-xl p-1 shadow-sm">
-            <button
-              onClick={() => {
-                setIsSignup(false);
-                setError('');
-              }}
-              className={`flex-1 py-3 px-4 rounded-lg font-bold transition ${
-                !isSignup
-                  ? 'bg-green-600 text-white shadow-md'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              Login
-            </button>
-            <button
-              onClick={() => {
-                setIsSignup(true);
-                setError('');
-              }}
-              className={`flex-1 py-3 px-4 rounded-lg font-bold transition ${
-                isSignup
-                  ? 'bg-green-600 text-white shadow-md'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              Sign Up
-            </button>
-          </div>
-
-          {/* Role Selection Toggle */}
-          <div className="flex gap-3 mb-6 bg-white rounded-xl p-1 shadow-sm">
-            <button
-              onClick={() => {
-                setSelectedRole('admin');
-                setError('');
-                if (selectedRole === 'farmer') {
-                  setEmail('');
-                  setPassword('');
-                }
-              }}
-              className={`flex-1 py-3 px-4 rounded-lg font-bold transition ${
-                selectedRole === 'admin'
-                  ? 'bg-purple-600 text-white shadow-md'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              👨‍💼 Admin
-            </button>
-            <button
-              onClick={() => {
-                setSelectedRole('farmer');
-                setError('');
-                if (selectedRole === 'admin') {
-                  setEmail('');
-                  setPassword('');
-                }
-              }}
-              className={`flex-1 py-3 px-4 rounded-lg font-bold transition ${
-                selectedRole === 'farmer'
-                  ? 'bg-green-600 text-white shadow-md'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              👨‍🌾 Farmer
-            </button>
-          </div>
-
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg shadow-sm">
-              <p className="font-bold text-sm">⚠️ Error</p>
-              <p className="text-sm">{error}</p>
-            </div>
-          )}
-
-          {/* Email/Password Form */}
-          <form onSubmit={isSignup ? handleEmailSignup : handleEmailLogin}>
-            <div className="bg-white rounded-2xl p-8 shadow-lg">
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                {isSignup 
-                  ? (selectedRole === 'admin' ? '👨‍💼 Create Admin Account' : '👨‍🌾 Create Farmer Account')
-                  : (selectedRole === 'admin' ? '👨‍💼 Admin Login' : '👨‍🌾 Farmer Login')
-                }
-              </h2>
-              <p className="text-gray-600 text-sm mb-8">
-                {isSignup 
-                  ? getTranslation(language, 'joinGetRecommendations')
-                  : 'Login to access your farm dashboard and insights'}
+    <div className="login-page">
+      <div className="login-overlay">
+        {/* Left Side - Login/Signup Form */}
+        <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 md:p-8">
+          <div className="w-full max-w-sm animate-fadeInUp">
+            {/* Mobile Hero Section */}
+            <div className="lg:hidden bg-black/40 backdrop-blur-md rounded-2xl p-6 mb-6 text-white border border-white/20">
+              <h1 className="text-3xl font-bold mb-2">🌾 AgroSahyadri</h1>
+              <p className="text-base font-semibold text-green-100 mb-3">
+                Your Smart Farming Assistant
               </p>
+              <p className="text-green-100 text-sm">
+                Get AI-powered crop recommendations based on your farm conditions
+              </p>
+            </div>
 
-              {isSignup && (
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div>
+            {/* Role Selection Toggle - Switch Style */}
+            <div className="mb-6 flex justify-center">
+              <div className="bg-white/95 border-2 border-gray-300 rounded-full p-1 flex shadow-md backdrop-blur-sm">
+                <button
+                  onClick={() => {
+                    setSelectedRole('admin');
+                    setError('');
+                    setEmail('');
+                    setPassword('');
+                  }}
+                  className={`px-5 py-2 rounded-full font-bold transition text-sm md:text-base ${
+                    selectedRole === 'admin'
+                      ? 'bg-green-600 text-white'
+                      : 'text-gray-700 hover:text-gray-900'
+                  }`}
+                >
+                  👨‍💼 Admin
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedRole('farmer');
+                    setError('');
+                    setEmail('');
+                    setPassword('');
+                  }}
+                  className={`px-5 py-2 rounded-full font-bold transition text-sm md:text-base ${
+                    selectedRole === 'farmer'
+                      ? 'bg-green-600 text-white'
+                      : 'text-gray-700 hover:text-gray-900'
+                  }`}
+                >
+                  👨‍🌾 Farmer
+                </button>
+              </div>
+            </div>
+
+            {error && (
+              <div className="mb-5 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg shadow-sm animate-slideInLeft text-sm">
+                <p className="font-bold">⚠️ Oops! Something went wrong</p>
+                <p className="text-xs mt-1">{error}</p>
+              </div>
+            )}
+
+            {/* Email/Password Form */}
+            <form onSubmit={isSignup ? handleEmailSignup : handleEmailLogin}>
+              <div className="login-box">
+                {!isSignup ? (
+                  <>
+                    <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                      {selectedRole === 'admin' ? '👨‍💼 Admin Login' : '👨‍🌾 Farmer Login'}
+                    </h2>
+                    <p className="text-gray-600 text-sm mb-8">
+                      Login to access your farm dashboard and insights
+                    </p>
+
+                    <div className="mb-6">
                     <label className="block text-gray-700 text-sm font-bold mb-2">
-                      First Name
+                      Email Address
                     </label>
                     <input
-                      type="text"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      placeholder="First Name"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="your.email@example.com"
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      required
                     />
                   </div>
-                  <div>
+
+                  <div className="mb-6">
                     <label className="block text-gray-700 text-sm font-bold mb-2">
-                      Last Name
+                      Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition pr-12"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-3 text-gray-600 hover:text-gray-800 transition"
+                      >
+                        {showPassword ? '👁️' : '👁️‍🗨️'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="text-right mb-6">
+                    <a href="#forgot" className="text-green-600 hover:text-green-700 text-sm font-semibold">
+                      Forgot password?
+                    </a>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md mb-4"
+                  >
+                    {loading ? (
+                      <>
+                        <span className="inline-block animate-spin mr-2">⏳</span>
+                        Logging in...
+                      </>
+                    ) : (
+                      '🚀 Login'
+                    )}
+                  </button>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                      {selectedRole === 'admin' ? '👨‍💼 Create Admin Account' : '👨‍🌾 Create Farmer Account'}
+                    </h2>
+                    <p className="text-gray-600 text-sm mb-8">
+                      {getTranslation(language, 'joinGetRecommendations')}
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                      <label className="block text-gray-700 text-sm font-bold mb-2">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="First Name"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-gray-700 text-sm font-bold mb-2">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Last Name"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">
+                      Email Address
                     </label>
                     <input
-                      type="text"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      placeholder="Last Name"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="your.email@example.com"
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      required
                     />
                   </div>
-                </div>
+
+                  <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition pr-12"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-3 text-gray-600 hover:text-gray-800 transition"
+                      >
+                        {showPassword ? '👁️' : '👁️‍🗨️'}
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                      🔒 Use at least 8 characters with uppercase, lowercase, and numbers
+                    </p>
+                  </div>
+
+                  <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">
+                      Confirm Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition pr-12"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-3 text-gray-600 hover:text-gray-800 transition"
+                      >
+                        {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md mb-4"
+                  >
+                    {loading ? (
+                      <>
+                        <span className="inline-block animate-spin mr-2">⏳</span>
+                        Creating Account...
+                      </>
+                    ) : (
+                      '✓ Create Account'
+                    )}
+                  </button>
+                </>
               )}
 
-              <div className="mb-6">
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your.email@example.com"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
-                  required
-                />
-              </div>
-
-              <div className="mb-6">
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition pr-12"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-gray-600 hover:text-gray-800 transition"
-                  >
-                    {showPassword ? '👁️' : '👁️‍🗨️'}
-                  </button>
-                </div>
-                {isSignup && (
-                  <p className="text-xs text-gray-500 mt-2">
-                    🔒 Use at least 8 characters with uppercase, lowercase, and numbers
+              {/* Register/Login Links */}
+              <div className="mt-6 text-center border-t pt-6">
+                {!isSignup ? (
+                  <p className="text-gray-700 text-sm">
+                    Don't have an account?{' '}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSignup(true);
+                        setError('');
+                      }}
+                      className="text-green-600 hover:text-green-700 font-semibold transition"
+                    >
+                      Register
+                    </button>
+                  </p>
+                ) : (
+                  <p className="text-gray-700 text-sm">
+                    Already have an account?{' '}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSignup(false);
+                        setError('');
+                      }}
+                      className="text-green-600 hover:text-green-700 font-semibold transition"
+                    >
+                      Login
+                    </button>
                   </p>
                 )}
               </div>
-
-              {isSignup && (
-                <div className="mb-6">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">
-                    Confirm Password
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition pr-12"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-3 text-gray-600 hover:text-gray-800 transition"
-                    >
-                      {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md mb-4"
-              >
-                {loading ? (
-                  <>
-                    <span className="inline-block animate-spin mr-2">⏳</span>
-                    {isSignup ? 'Creating Account...' : 'Logging in...'}
-                  </>
-                ) : (
-                  isSignup ? '✓ Create Account' : '🚀 Login'
-                )}
-              </button>
-
-              {/* Divider - Only show for email login */}
-              {/* Google button removed - Firebase deprioritized */}
-
             </div>
+            </form>
+          </div>
+        </div>
 
-            {/* Trust Indicators */}
-            <div className="mt-4 text-center">
-              <p className="text-xs text-gray-600">
-                🔒 Secure & Encrypted | ✓ Your data is protected
+        {/* Right Side - Farm Hero Section */}
+        <div className="hidden lg:flex lg:w-1/2 flex-col justify-start items-center p-8 xl:p-12 text-white pt-12">
+          <div className="max-w-sm w-full">
+            {/* Logo & Tagline */}
+            <div className="text-center animate-fadeInUp">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <span className="text-6xl">🌾</span>
+                <h1 className="text-5xl xl:text-6xl font-bold">AgroSahyadri</h1>
+              </div>
+              <p className="text-xl xl:text-2xl font-semibold text-green-100 mb-2">
+                Your Digital Farmer's Assistant
+              </p>
+              <p className="text-green-200 text-sm xl:text-base border-l-4 border-yellow-400 pl-3 py-2">
+                Using AI to help you grow better crops with less effort
               </p>
             </div>
-          </form>
-
-          {/* Admin Login Link */}
-          {!isSignup && (
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600 mb-2">Are you an admin?</p>
-              <a 
-                href="/admin/login"
-                className="text-green-600 hover:text-green-700 font-semibold text-sm transition"
-              >
-                → Go to Admin Login
-              </a>
-            </div>
-          )}
-
-          <div className="mt-8 text-center">
-            <p className="text-xs text-gray-600 mb-1">
-              💚 Built by Farmers, for Maharashtra Farmers
-            </p>
-            <p className="text-xs text-gray-500">
-              Available on Web & Mobile • Privacy Protected
-            </p>
           </div>
         </div>
       </div>

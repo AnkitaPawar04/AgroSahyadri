@@ -36,11 +36,41 @@ class CropRecommendationResponse(BaseModel):
 @router.post("/predict", response_model=CropRecommendationResponse)
 async def predict_crop(request: CropRecommendationRequest, db: Session = Depends(get_db)):
     """
-    Predict crop using ML model based on soil and weather data
+    Predict crop using ML model based on soil, weather, DISTRICT, and SEASON
     """
     
     # Get district from coordinates
     district = get_district_from_coordinates(request.latitude, request.longitude)
+    season = request.season.lower().strip()
+    
+    # Season-specific crop filters - Comprehensive list for Maharashtra
+    season_crops = {
+        "kharif": [
+            # Primary Kharif crops
+            "rice", "maize", "cotton", "sugarcane",
+            # Pulses
+            "pigeonpeas", "pigeonpea", "mungbean", "mung", "blackgram", "urid", 
+            "mothbeans", "groundnut",
+            # Other
+            "jowar", "sorghum", "soybeans", "soybean"
+        ],
+        "rabi": [
+            # Primary Rabi crops
+            "wheat", "chickpea", "chick pea", "gram", "lentil", "lentils", 
+            "barley", "oats",
+            # Oilseeds
+            "mustard", "rapeseed", "sunflower",
+            # Vegetables
+            "onion", "garlic", "peas", "pea",
+            # Others
+            "sugarcane", "jowar", "sorghum", "maize"
+        ],
+        "zaid": [
+            # Summer vegetables
+            "watermelon", "muskmelon", "cucumber", "squash", 
+            "pumpkin", "bottlegourd", "bottle gourd", "cowpea", "okra", "brinjal"
+        ]
+    }
     
     # Get soil data for district
     soil_data = get_soil_data(district)
@@ -57,7 +87,7 @@ async def predict_crop(request: CropRecommendationRequest, db: Session = Depends
     # Get ML model instance
     model = get_model()
     
-    # Get prediction from trained model
+    # Get raw predictions from trained model (without season filtering)
     prediction_result = model.predict(
         nitrogen=request.nitrogen,
         phosphorus=request.phosphorus,
@@ -68,8 +98,72 @@ async def predict_crop(request: CropRecommendationRequest, db: Session = Depends
         rainfall=rainfall
     )
     
-    # Format top crops response
-    top_crops_list = [crop["crop"] for crop in prediction_result["top_crops"]]
+    # FILTER TOP CROPS BY SEASON (Kharif, Rabi, Zaid)
+    allowed_crops = season_crops.get(season.lower(), [])
+    
+    if not allowed_crops:
+        # Invalid season - should not happen, but default to Kharif
+        allowed_crops = season_crops["kharif"]
+        season = "kharif"
+    
+    # Normalize allowed crops to lowercase for comparison
+    allowed_crops_normalized = [crop.lower() for crop in allowed_crops]
+    
+    # Filter predictions - show crops that are allowed for this season
+    # Skip duplicate crops - keep only first occurrence of each crop name
+    filtered_crops = []
+    seen_crops = set()
+    
+    for crop in prediction_result["top_crops"]:
+        crop_name_lower = crop["crop"].lower()
+        
+        # Check if crop matches any in the allowed list (handle spaces and variations)
+        if any(allowed in crop_name_lower or crop_name_lower in allowed for allowed in allowed_crops_normalized):
+            # Skip if we've already seen this crop (avoid duplicates)
+            if crop_name_lower not in seen_crops:
+                filtered_crops.append(crop)
+                seen_crops.add(crop_name_lower)
+    
+    # Log debug info
+    print(f"DEBUG: {district} - {season.upper()} - Found {len(filtered_crops)} unique seasonal crops from top predictions")
+    
+    # If we found seasonal crops, use them (up to 3 unique crops)
+    if len(filtered_crops) >= 1:
+        top_crops_list = [crop["crop"] for crop in filtered_crops[:3]]
+        
+        # Pad with other top crops if needed (but only if different from seasonal crops)
+        if len(top_crops_list) < 3:
+            for crop in prediction_result["top_crops"]:
+                crop_name_lower = crop["crop"].lower()
+                if crop_name_lower not in seen_crops:
+                    top_crops_list.append(crop["crop"])
+                    seen_crops.add(crop_name_lower)
+                    if len(top_crops_list) == 3:
+                        break
+    else:
+        # Fallback: if no seasonal match found, use top unique crops
+        top_crops_list = []
+        seen_crops_fallback = set()
+        
+        for crop in prediction_result["top_crops"]:
+            crop_name_lower = crop["crop"].lower()
+            if crop_name_lower not in seen_crops_fallback:
+                top_crops_list.append(crop["crop"])
+                seen_crops_fallback.add(crop_name_lower)
+                if len(top_crops_list) == 3:
+                    break
+        
+        print(f"Info: No seasonal crops found for {season} in {district}. Showing top unique recommendations.")
+    
+    if not top_crops_list:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Unable to find crop recommendations for {district} with current soil conditions. Please adjust soil parameters (nitrogen, phosphorus, potassium, pH)."
+        )
+    
+    # Get confidence from first filtered crop or first prediction
+    recommended_crop = top_crops_list[0]
+    confidence = filtered_crops[0]["confidence"] if filtered_crops else prediction_result["confidence"]
     
     # Save prediction in database
     try:
@@ -77,8 +171,8 @@ async def predict_crop(request: CropRecommendationRequest, db: Session = Depends
             farmer_id=request.farmer_id,
             district=district,
             season=request.season,
-            recommended_crop=prediction_result["recommended_crop"],
-            confidence=prediction_result["confidence"],
+            recommended_crop=recommended_crop,
+            confidence=filtered_crops[0]["confidence"] if filtered_crops else prediction_result["confidence"],
             top_crops=json.dumps(top_crops_list)
         )
         db.add(prediction)
@@ -87,8 +181,8 @@ async def predict_crop(request: CropRecommendationRequest, db: Session = Depends
         print(f"Warning: Could not save prediction to DB: {e}")
     
     return {
-        "recommended_crop": prediction_result["recommended_crop"],
-        "confidence": prediction_result["confidence"],
+        "recommended_crop": recommended_crop,
+        "confidence": filtered_crops[0]["confidence"] if filtered_crops else prediction_result["confidence"],
         "top_crops": top_crops_list,
         "district": district,
         "season": request.season

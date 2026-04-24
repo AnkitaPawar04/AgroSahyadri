@@ -58,14 +58,14 @@ const AdminNotificationsPage = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen admin-page">
       <Sidebar currentPage="notifications" />
       
       <div className="flex-1 overflow-auto">
         <div className="p-8">
           {message.visible && (
-            <div className={`mb-6 p-4 rounded-lg text-white font-semibold ${
-              message.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            <div className={`mb-6 p-4 rounded-lg text-gray-900 dark:text-white font-semibold ${
+              message.type === 'success' ? 'bg-green-100 dark:bg-green-500' : 'bg-red-100 dark:bg-red-500'
             }`}>
               {message.text}
             </div>
@@ -73,8 +73,11 @@ const AdminNotificationsPage = () => {
 
           <div className="mb-8 flex justify-between items-center">
             <div>
-              <h1 className="text-4xl font-bold text-gray-800">📢 {getTranslation(language, 'adminNotificationsPage')}</h1>
-              <p className="text-gray-600 text-lg mt-2">{getTranslation(language, 'sendNotificationsToFarmers')}</p>
+              <div className="page-header mb-0">
+                <h1 className="page-title">{getTranslation(language, 'adminNotificationsPage')}</h1>
+                <p className="page-subtitle">{getTranslation(language, 'sendNotificationsToFarmers')}</p>
+                <div className="page-divider"></div>
+              </div>
             </div>
             {!showForm && (
               <button
@@ -206,23 +209,23 @@ const AdminNotificationsPage = () => {
           </div>
 
           {/* Stats Card */}
-          <div className="mt-8 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg shadow-lg p-6 text-white">
+          <div className="mt-8 bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-500 dark:to-indigo-600 rounded-lg shadow-lg p-6 text-gray-800 dark:text-white">
             <h3 className="text-xl font-bold mb-4">📊 Notification Stats</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <p className="text-purple-100 text-sm">Total Sent</p>
+                <p className="text-purple-700 dark:text-purple-100 text-sm">Total Sent</p>
                 <p className="text-3xl font-bold">{notifications.length}</p>
               </div>
               <div>
-                <p className="text-purple-100 text-sm">To All Farmers</p>
+                <p className="text-purple-700 dark:text-purple-100 text-sm">To All Farmers</p>
                 <p className="text-3xl font-bold">{notifications.filter(n => n.targetUsers === 'All Farmers').length}</p>
               </div>
               <div>
-                <p className="text-purple-100 text-sm">District-wise</p>
+                <p className="text-purple-700 dark:text-purple-100 text-sm">District-wise</p>
                 <p className="text-3xl font-bold">{notifications.filter(n => n.targetUsers !== 'All Farmers').length}</p>
               </div>
               <div>
-                <p className="text-purple-100 text-sm">This Month</p>
+                <p className="text-purple-700 dark:text-purple-100 text-sm">This Month</p>
                 <p className="text-3xl font-bold">{notifications.length}</p>
               </div>
             </div>

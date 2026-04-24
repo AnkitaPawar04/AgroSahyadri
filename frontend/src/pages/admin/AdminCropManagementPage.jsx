@@ -2,17 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
 import { useApp } from '../../contexts/AppContext';
 import { getTranslation, getCropTranslation } from '../../utils/i18n';
-
-const SUPPORTED_CROPS = [
-  { id: 1, name: 'Sugarcane', season: 'Kharif', tempMin: 20, tempMax: 30, rainfall: 150, soilType: 'Loamy' },
-  { id: 2, name: 'Cotton', season: 'Kharif', tempMin: 21, tempMax: 32, rainfall: 60, soilType: 'Black Soil' },
-  { id: 3, name: 'Wheat', season: 'Rabi', tempMin: 5, tempMax: 25, rainfall: 40, soilType: 'Loamy' },
-  { id: 4, name: 'Jowar', season: 'Kharif', tempMin: 18, tempMax: 35, rainfall: 50, soilType: 'Black Soil' },
-];
+import { adminAPI } from '../../services/api';
 
 const AdminCropManagementPage = () => {
   const { language } = useApp();
-  const [crops, setCrops] = useState(SUPPORTED_CROPS);
+  const [crops, setCrops] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingCrop, setEditingCrop] = useState(null);
   const [formData, setFormData] = useState({
@@ -24,6 +19,38 @@ const AdminCropManagementPage = () => {
     soilType: ''
   });
   const [message, setMessage] = useState({ type: '', text: '', visible: false });
+
+  // Fetch crops from trained model
+  useEffect(() => {
+    fetchSupportedCrops();
+  }, []);
+
+  const fetchSupportedCrops = async () => {
+    setLoading(true);
+    try {
+      const response = await adminAPI.getSupportedCrops();
+      const cropList = response.data.crops.map((cropName, index) => ({
+        id: index + 1,
+        name: cropName.charAt(0).toUpperCase() + cropName.slice(1),
+        season: 'All',
+        tempMin: 15,
+        tempMax: 35,
+        rainfall: 100,
+        soilType: 'Loamy'
+      }));
+      setCrops(cropList);
+    } catch (error) {
+      console.error('Failed to fetch supported crops:', error);
+      setMessage({ 
+        type: 'error', 
+        text: 'Failed to fetch crops from trained model', 
+        visible: true 
+      });
+      setTimeout(() => setMessage({ ...message, visible: false }), 3000);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -82,15 +109,26 @@ const AdminCropManagementPage = () => {
     setFormData({ name: '', season: 'Kharif', tempMin: '', tempMax: '', rainfall: '', soilType: '' });
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-transparent">
+        <div className="text-center">
+          <p className="text-2xl font-bold text-white">⏳ Loading Crops from Trained Model...</p>
+          <p className="text-gray-300 mt-2">Please wait while we fetch the supported crops</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen admin-page">
       <Sidebar currentPage="crops" />
       
       <div className="flex-1 overflow-auto">
         <div className="p-8">
           {message.visible && (
-            <div className={`mb-6 p-4 rounded-lg text-white font-semibold ${
-              message.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            <div className={`mb-6 p-4 rounded-lg text-gray-900 dark:text-white font-semibold ${
+              message.type === 'success' ? 'bg-green-100 dark:bg-green-500' : 'bg-red-100 dark:bg-red-500'
             }`}>
               {message.text}
             </div>
@@ -98,8 +136,11 @@ const AdminCropManagementPage = () => {
 
           <div className="mb-8 flex justify-between items-center">
             <div>
-              <h1 className="text-4xl font-bold text-gray-800">🌾 {getTranslation(language, 'cropManagementPage')}</h1>
-              <p className="text-gray-600 text-lg mt-2">{getTranslation(language, 'manageCropRequirements')}</p>
+              <div className="page-header mb-0">
+                <h1 className="page-title">{getTranslation(language, 'cropManagementPage')}</h1>
+                <p className="page-subtitle">{getTranslation(language, 'manageCropRequirements')}</p>
+                <div className="page-divider"></div>
+              </div>
             </div>
             {!showForm && (
               <button
@@ -112,14 +153,14 @@ const AdminCropManagementPage = () => {
           </div>
 
           {showForm && (
-            <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            <div className="bg-white rounded-lg shadow-lg p-6 mb-8 border border-emerald-200">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
                 {editingCrop ? '✏️ ' + getTranslation(language, 'editCrop') : '➕ ' + getTranslation(language, 'addNewCrop')}
               </h2>
               
               <form onSubmit={handleAddCrop} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-gray-700 font-semibold mb-2">{getTranslation(language, 'nameLabel')}</label>
+                  <label className="block text-slate-300 font-semibold mb-2">{getTranslation(language, 'nameLabel')}</label>
                   <input
                     type="text"
                     name="name"
@@ -220,15 +261,15 @@ const AdminCropManagementPage = () => {
             </div>
           )}
 
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">📋 {getTranslation(language, 'supportedCrops')} ({crops.length})</h2>
+          <div className="bg-white rounded-lg shadow-lg p-6 border border-emerald-200">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">📋 {getTranslation(language, 'supportedCrops')} ({crops.length})</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {crops.map(crop => (
-                <div key={crop.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition">
-                  <h3 className="text-xl font-bold text-gray-800 mb-3">🌾 {getCropTranslation(crop.name, language)}</h3>
+                <div key={crop.id} className="border border-emerald-200 dark:border-emerald-700/50 rounded-lg p-4 bg-white dark:bg-slate-700/40 hover:shadow-lg hover:border-emerald-300 dark:hover:border-emerald-600/70 transition">
+                  <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-3">🌾 {getCropTranslation(crop.name, language)}</h3>
                   
-                  <div className="space-y-2 text-sm text-gray-600 mb-4">
+                  <div className="space-y-2 text-sm text-gray-700 dark:text-slate-300 mb-4">
                     <p><strong>{getTranslation(language, 'season')}:</strong> {crop.season}</p>
                     <p><strong>{getTranslation(language, 'temperature')}:</strong> {crop.tempMin}°C - {crop.tempMax}°C</p>
                     <p><strong>{getTranslation(language, 'rainfall')}:</strong> {crop.rainfall}mm</p>

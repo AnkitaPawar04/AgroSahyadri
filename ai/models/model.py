@@ -749,14 +749,29 @@ district_soil["ph"] = 6.5
 
 season_crops = {
     "kharif": [
-        "rice","maize","cotton","pigeonpeas",
-        "mungbean","blackgram","mothbeans"
+        # Primary crops
+        "rice","maize","cotton","sugarcane",
+        # Pulses
+        "pigeonpeas", "pigeonpea", "mungbean", "mung", "blackgram", "urid", 
+        "mothbeans", "groundnut",
+        # Other
+        "jowar", "sorghum", "soybeans", "soybean"
     ],
     "rabi": [
-        "wheat","chickpea","lentil","barley"
+        # Primary crops
+        "wheat","chickpea","chick pea","gram","lentil","lentils",
+        "barley", "oats",
+        # Oilseeds
+        "mustard", "rapeseed", "sunflower",
+        # Vegetables
+        "onion", "garlic", "peas", "pea",
+        # Others
+        "sugarcane", "jowar", "sorghum", "maize"
     ],
     "zaid": [
-        "watermelon","muskmelon","cucumber"
+        # Summer vegetables
+        "watermelon", "muskmelon", "cucumber", "squash", 
+        "pumpkin", "bottlegourd", "bottle gourd", "cowpea", "okra", "brinjal"
     ]
 }
 

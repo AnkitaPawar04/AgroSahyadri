@@ -7,6 +7,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 30000, // 30 second timeout for all requests
 });
 
 // Add token to requests
@@ -44,6 +45,12 @@ export const authAPI = {
       first_name: firstName,
       last_name: lastName
     }),
+
+  getFarmerProfile: (farmerId) =>
+    api.get(`/auth/profile/${farmerId}`),
+
+  updateFarmerProfile: (farmerId, profileData) =>
+    api.put(`/auth/profile/${farmerId}`, profileData),
 };
 
 // Crop APIs
@@ -74,12 +81,24 @@ export const cropAPI = {
 export const weatherAPI = {
   getCurrentWeather: (latitude, longitude) =>
     api.get(`/weather/current/${latitude}/${longitude}`),
+  
+  getForecast: (latitude, longitude) =>
+    api.get(`/weather/forecast/${latitude}/${longitude}`),
 };
 
 // Soil APIs
 export const soilAPI = {
   getSoilData: (district) =>
     api.get(`/soil/${district}`),
+};
+
+// Irrigation APIs
+export const irrigationAPI = {
+  predictIrrigation: (requestData) =>
+    api.post('/irrigation/predict', requestData),
+  
+  getIrrigationHistory: (farmerId) =>
+    api.get(`/irrigation/history/${farmerId}`),
 };
 
 // Admin APIs
@@ -101,6 +120,9 @@ export const adminAPI = {
   
   deleteFarmer: (farmerId) =>
     api.delete(`/admin/farmers/${farmerId}`),
+  
+  getSupportedCrops: () =>
+    api.get('/crop/supported-crops'),
 };
 
 export default api;

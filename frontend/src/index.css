@@ -33,21 +33,171 @@ body.dark {
   @apply max-w-7xl mx-auto px-4;
 }
 
+/* Farm-themed backgrounds */
+.farm-bg-pattern {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+  position: relative;
+}
+
+.farm-bg-pattern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+/* Soil-themed dark green gradient */
+.soil-gradient {
+  background: linear-gradient(135deg, #1f4d2f 0%, #2d6b4a 50%, #3d8b5f 100%);
+}
+
+/* Golden wheat field background */
+.field-gradient {
+  background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%);
+}
+
 .btn-primary {
-  @apply bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition;
+  @apply bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition transform hover:scale-105;
 }
 
 .btn-secondary {
   @apply bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition;
 }
 
+.btn-farm {
+  @apply bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-xl transition transform hover:scale-105 shadow-lg;
+}
+
 /* Card Styles */
 .card {
-  @apply bg-white dark:bg-gray-800 dark:border dark:border-gray-700 rounded-lg shadow-md dark:shadow-xl transition-all duration-300 hover:shadow-xl dark:hover:shadow-2xl hover:-translate-y-1 dark:hover:-translate-y-2;
+  position: relative;
+  overflow: hidden;
+  background: white;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  backdrop-filter: blur(15px);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
 }
 
 .card:hover {
-  @apply dark:border-gray-600;
+  box-shadow: 0 20px 40px rgba(34, 197, 94, 0.15), 0 0 30px rgba(34, 197, 94, 0.08);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+  z-index: 1;
+}
+
+.card:hover::before {
+  left: 100%;
+}
+
+.card-content {
+  @apply p-6;
+}
+
+/* Farm feature card */
+.farm-card {
+  @apply bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-2 border-green-100;
+}
+
+.farm-card:hover {
+  @apply border-green-500;
+}
+
+/* Icons and labels */
+.farm-icon {
+  @apply text-4xl mb-3;
+}
+
+.farm-feature-title {
+  @apply text-xl font-bold text-gray-800 mb-2;
+}
+
+.farm-feature-desc {
+  @apply text-gray-600 text-sm;
+}
+
+/* Button hover effects */
+.btn-hover {
+  @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-1 active:translate-y-0;
+}
+
+/* Info Box */
+.info-box {
+  @apply bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-lg;
+}
+
+.info-box-red {
+  @apply bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg;
+}
+
+.info-box-yellow {
+  @apply bg-yellow-50 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg;
+}
+
+/* Farm-themed input styles */
+.farm-input {
+  @apply w-full px-4 py-3 border-2 border-green-200 rounded-lg focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-200 transition;
+}
+
+/* Loading animation */
+@keyframes pulse-farm {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-farm {
+  animation: pulse-farm 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Fade in animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Slide in from left */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slideInLeft {
+  animation: slideInLeft 0.6s ease-out;
 }
 
 .card-interactive {
@@ -111,19 +261,19 @@ body.dark {
 }
 
 .input-field {
-  @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 dark:focus:ring-green-900 transition-all duration-200;
+  @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white/90 dark:bg-gray-700/90 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 dark:focus:ring-green-900 transition-all duration-200 backdrop-blur-sm;
 }
 
 .input-field:hover {
-  @apply dark:border-gray-500;
+  @apply dark:border-gray-500 bg-white/95 dark:bg-gray-700/95;
 }
 
 .select-field {
-  @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-green-500 transition-all duration-200;
+  @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white/90 dark:bg-gray-700/90 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-green-500 transition-all duration-200 backdrop-blur-sm;
 }
 
 .select-field:hover {
-  @apply dark:border-gray-500;
+  @apply dark:border-gray-500 bg-white/95 dark:bg-gray-700/95;
 }
 
 /* Button Hover Effects */
@@ -207,4 +357,1076 @@ body.dark {
 /* Smooth Transitions */
 * {
   @apply transition-colors duration-300;
+}
+
+/* ===== ADMIN DASHBOARD BACKGROUND ===== */
+
+.admin-app-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a4d2e 0%, #2d6b4a 25%, #1f5438 50%, #2d5a3d 75%, #1a4d2e 100%);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.admin-app-wrapper.dark {
+  background: linear-gradient(135deg, #0f3d1f 0%, #1a5a35 25%, #164028 50%, #1f5438 75%, #0f3d1f 100%);
+}
+
+/* Grid Background Pattern */
+.admin-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(90deg, rgba(34, 197, 94, 0.08) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(34, 197, 94, 0.08) 1px, transparent 1px);
+  background-size: 50px 50px;
+  z-index: 1;
+  animation: grid-scroll 20s linear infinite;
+}
+
+@keyframes grid-scroll {
+  0% { background-position: 0 0; }
+  100% { background-position: 50px 50px; }
+}
+
+/* Animated Gradient Orbs */
+.admin-orb {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  filter: blur(60px);
+  z-index: 2;
+}
+
+.admin-orb-1 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.35), transparent 70%);
+  top: 5%;
+  right: 10%;
+  animation: float 15s ease-in-out infinite;
+}
+
+.admin-orb-2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(51, 160, 76, 0.25), transparent 70%);
+  bottom: 10%;
+  left: 5%;
+  animation: float 20s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+.admin-orb-3 {
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(74, 222, 128, 0.2), transparent 70%);
+  top: 40%;
+  left: 50%;
+  animation: float 18s ease-in-out infinite;
+  animation-delay: 4s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  25% { transform: translateY(-40px) translateX(30px); }
+  50% { transform: translateY(-80px) translateX(0px); }
+  75% { transform: translateY(-40px) translateX(-30px); }
+}
+
+/* Data Visualization Elements */
+.admin-data-viz {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.data-float {
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.3;
+  animation: data-float-anim 6s ease-in-out infinite;
+}
+
+.data-float-1 { top: 15%; left: 10%; animation-delay: 0s; }
+.data-float-2 { top: 25%; right: 15%; animation-delay: 1s; }
+.data-float-3 { bottom: 20%; left: 20%; animation-delay: 2s; }
+.data-float-4 { bottom: 30%; right: 10%; animation-delay: 1.5s; }
+.data-float-5 { top: 50%; left: 5%; animation-delay: 2.5s; }
+.data-float-6 { top: 35%; right: 5%; animation-delay: 0.5s; }
+
+@keyframes data-float-anim {
+  0%, 100% { transform: translateY(0) rotateZ(0deg) scale(1); opacity: 0.2; }
+  50% { transform: translateY(-50px) rotateZ(180deg) scale(1.1); opacity: 0.4; }
+}
+
+/* Network Lines */
+.admin-network {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.animate-line {
+  animation: line-pulse 3s ease-in-out infinite;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+}
+
+@keyframes line-pulse {
+  0% { stroke-dashoffset: 1000; opacity: 0.1; }
+  50% { opacity: 0.3; }
+  100% { stroke-dashoffset: 0; opacity: 0.1; }
+}
+
+/* Hexagon Grid */
+.admin-hexagons {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.hex {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border: 2px solid rgba(34, 197, 94, 0.3);
+  clip-path: polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
+  animation: hex-pulse 4s ease-in-out infinite;
+}
+
+@keyframes hex-pulse {
+  0%, 100% { 
+    border-color: rgba(34, 197, 94, 0.3);
+    transform: scale(1);
+  }
+  50% { 
+    border-color: rgba(74, 222, 128, 0.6);
+    transform: scale(1.1);
+  }
+}
+
+/* Top Header Bar Effect */
+.admin-header-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.5), transparent);
+  z-index: 3;
+  box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+}
+
+/* Admin Content */
+.admin-content {
+  position: relative;
+  z-index: 10;
+}
+
+/* Universal Farm Page Background */
+.farm-app-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 20%, #f4e4c1 70%, #8B7355 100%);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.farm-app-wrapper.dark {
+  background: linear-gradient(180deg, #1a3a52 0%, #0f4620 40%, #2d3f2f 100%);
+}
+
+/* Sky Layer */
+.farm-sky {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 25%;
+  background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 100%);
+  z-index: 1;
+}
+
+.farm-sky.dark {
+  background: linear-gradient(180deg, #1a3a52 0%, #2a5f7f 100%);
+}
+
+/* Animated Clouds */
+.farm-clouds {
+  position: absolute;
+  top: 5%;
+  left: 0;
+  right: 0;
+  height: 15%;
+  z-index: 2;
+  opacity: 0.6;
+}
+
+.cloud {
+  position: absolute;
+  background: white;
+  border-radius: 100px;
+  opacity: 0.7;
+  animation: float 15s infinite ease-in-out;
+}
+
+.cloud.dark {
+  background: rgba(200, 200, 200, 0.3);
+}
+
+.cloud1 { width: 100px; height: 40px; top: 10%; left: 10%; animation-duration: 20s; }
+.cloud2 { width: 150px; height: 50px; top: 20%; right: 15%; animation-duration: 25s; animation-direction: reverse; }
+.cloud3 { width: 120px; height: 45px; top: 5%; left: 50%; animation-duration: 22s; animation-delay: 5s; }
+.cloud4 { width: 80px; height: 35px; top: 15%; right: 30%; animation-duration: 18s; animation-delay: 2s; animation-direction: reverse; }
+
+/* Sun/Moon Element */
+.farm-sun {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
+  border-radius: 50%;
+  top: 5%;
+  right: 10%;
+  z-index: 1;
+  box-shadow: 0 0 50px rgba(255, 165, 0, 0.3);
+  animation: sun-glow 4s ease-in-out infinite;
+}
+
+.farm-sun.dark {
+  background: radial-gradient(circle at 30% 30%, #E8D700, #D4AF37);
+  opacity: 0.8;
+}
+
+@keyframes sun-glow {
+  0%, 100% { box-shadow: 0 0 50px rgba(255, 165, 0, 0.3); }
+  50% { box-shadow: 0 0 70px rgba(255, 165, 0, 0.5); }
+}
+
+/* Main Farm Field Background */
+.farm-field {
+  position: absolute;
+  top: 25%;
+  left: 0;
+  right: 0;
+  height: 75%;
+  background: linear-gradient(180deg, #c4d96f 0%, #a4c639 30%, #8fb344 60%, #7a9844 100%);
+  z-index: 2;
+}
+
+.farm-field.dark {
+  background: linear-gradient(180deg, #4a5f2f 0%, #3d5429 30%, #2f4620 60%, #1f3a1f 100%);
+}
+
+/* Animated Field Rows */
+.farm-rows {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background-image: 
+    linear-gradient(90deg, transparent 24%, rgba(34, 197, 94, 0.1) 25%, rgba(34, 197, 94, 0.1) 26%, transparent 27%, transparent 74%, rgba(34, 197, 94, 0.1) 75%, rgba(34, 197, 94, 0.1) 76%, transparent 77%, transparent),
+    linear-gradient(0deg, transparent 24%, rgba(34, 197, 94, 0.05) 25%, rgba(34, 197, 94, 0.05) 26%, transparent 27%, transparent 74%, rgba(34, 197, 94, 0.05) 75%, rgba(34, 197, 94, 0.05) 76%, transparent 77%, transparent);
+  background-size: 60px 60px;
+  animation: field-shift 20s linear infinite;
+  z-index: 2;
+}
+
+@keyframes field-shift {
+  0% { background-position: 0 0; }
+  100% { background-position: 60px 60px; }
+}
+
+/* Crop Plants Layer */
+.farm-crops {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  z-index: 3;
+}
+
+.crop-group {
+  position: absolute;
+  animation: sway 3s ease-in-out infinite;
+}
+
+.crop-group:nth-child(1) { left: 5%; top: 20%; animation-delay: 0s; }
+.crop-group:nth-child(2) { left: 15%; top: 10%; animation-delay: 0.5s; }
+.crop-group:nth-child(3) { left: 30%; top: 15%; animation-delay: 1s; }
+.crop-group:nth-child(4) { left: 45%; top: 25%; animation-delay: 0.3s; }
+.crop-group:nth-child(5) { right: 5%; top: 20%; animation-delay: 0.8s; }
+.crop-group:nth-child(6) { right: 20%; top: 10%; animation-delay: 1.5s; }
+
+@keyframes sway {
+  0%, 100% { transform: translateX(0) rotateZ(0deg); }
+  50% { transform: translateX(10px) rotateZ(2deg); }
+}
+
+/* Tree/Boundaries */
+.farm-trees {
+  position: absolute;
+  bottom: 10%;
+  left: 0;
+  right: 0;
+  height: 30%;
+  z-index: 4;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  padding: 0 20px;
+}
+
+.tree {
+  position: relative;
+  animation: gentle-sway 4s ease-in-out infinite;
+  width: 100px;
+  height: auto;
+}
+
+.tree-trunk {
+  width: 12px;
+  height: 60px;
+  background: linear-gradient(90deg, #654321 0%, #8B6F47 50%, #654321 100%);
+  margin: 0 auto;
+  border-radius: 2px;
+}
+
+.tree-foliage {
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(ellipse 50px 60px at 50% 30%, #2d5016 0%, #1a3a0a 70%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  margin: 0 auto;
+  position: relative;
+  top: -35px;
+  box-shadow: inset 0 -10px 15px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes gentle-sway {
+  0%, 100% { transform: rotateZ(0deg); transform-origin: bottom center; }
+  25% { transform: rotateZ(1deg); transform-origin: bottom center; }
+  75% { transform: rotateZ(-1deg); transform-origin: bottom center; }
+}
+
+/* Dust/Particles Animation */
+.farm-dust {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.dust-particle {
+  position: absolute;
+  background: radial-gradient(circle, rgba(255, 200, 124, 0.4), transparent);
+  border-radius: 50%;
+  animation: dust-float 8s infinite ease-in;
+}
+
+.dust-particle:nth-child(1) { width: 20px; height: 20px; left: 10%; top: 30%; animation-delay: 0s; }
+.dust-particle:nth-child(2) { width: 15px; height: 15px; left: 30%; top: 50%; animation-delay: 2s; }
+.dust-particle:nth-child(3) { width: 25px; height: 25px; left: 50%; top: 40%; animation-delay: 4s; }
+.dust-particle:nth-child(4) { width: 18px; height: 18px; left: 70%; top: 60%; animation-delay: 1s; }
+.dust-particle:nth-child(5) { width: 22px; height: 22px; right: 10%; top: 35%; animation-delay: 3s; }
+
+@keyframes dust-float {
+  0% {
+    opacity: 0;
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-200px) translateX(50px);
+  }
+}
+
+/* Foreground (for content) */
+.farm-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+}
+
+/* Page Background Override */
+body {
+  background: transparent !important;
+}
+
+.flex {
+  position: relative;
+  z-index: 10;
+}
+
+/* Dashboard Farm Styling */
+.farm-dashboard {
+  background: transparent;
+  position: relative;
+  overflow-x: hidden;
+  min-height: 100%;
+}
+
+.farm-dashboard.dark {
+  background: transparent;
+}
+
+/* Dashboard Background Video - Clear, Cinematic */
+.dashboard-bg-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+  pointer-events: none;
+  filter: none;
+  image-rendering: auto;
+}
+
+/* Dashboard Content - Crystal Clear Video Visibility */
+.dashboard-content {
+  position: relative;
+  z-index: 10;
+  min-height: auto;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+/* Sidebar - Always on top */
+.w-64 {
+  position: relative;
+  z-index: 100;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Enhanced Farm Cards */
+.farm-card {
+  position: relative;
+  overflow: hidden;
+  background: white;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  backdrop-filter: blur(15px);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .farm-card {
+  background: rgba(31, 41, 55, 0.92);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.farm-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+  z-index: 1;
+}
+
+.farm-card:hover::before {
+  left: 100%;
+}
+
+/* Stat Cards Animation */
+.stat-card {
+  animation: slideInUp 0.6s ease-out;
+}
+
+/* Glow effect for farm elements */
+.farm-card:hover {
+  box-shadow: 0 20px 40px rgba(34, 197, 94, 0.15), 0 0 30px rgba(34, 197, 94, 0.08) !important;
+}
+
+/* Grid gap animation */
+.grid > div {
+  animation: fadeInUp 0.6s ease-out backwards;
+}
+
+.grid > div:nth-child(1) { animation-delay: 0s; }
+.grid > div:nth-child(2) { animation-delay: 0.1s; }
+.grid > div:nth-child(3) { animation-delay: 0.2s; }
+.grid > div:nth-child(4) { animation-delay: 0.3s; }
+
+/* Pulse animation for important elements */
+@keyframes pulse-farm {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-pulse-farm {
+  animation: pulse-farm 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Floating animation for icons */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Smooth slide-in for sections */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideInUp {
+  animation: slideInUp 0.6s ease-out;
+}
+
+/* Stagger animation for multiple elements */
+@keyframes staggerIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Background gradient animation */
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+}
+
+/* ===== PAGE HEADER STYLING - PREMIUM GLASSMORPHISM ===== */
+
+.page-header {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.page-title {
+  font-size: 36px;
+  font-weight: 800;
+  margin: 0 0 4px 0;
+  padding: 0;
+
+  color: #ffffff;
+  text-align: left;
+}
+
+.page-subtitle {
+  color: #ffffff;
+  font-style: italic;
+  font-size: 15px;
+  text-align: left;
+  margin: 6px 0 4px 0;
+  padding: 0;
+  opacity: 0.95;
+}
+
+.page-divider {
+  height: 3px;
+  margin-top: 10px;
+  border-radius: 2px;
+
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.7);
+
+  animation: lineGrow 1s ease forwards;
+}
+
+@keyframes lineGrow {
+  from {
+    width: 0;
+  }
+  to {
+    width: 180px;
+  }
+}
+
+/* ===== SIDEBAR STYLING - MODERN & CLEAN ===== */
+
+.sidebar {
+  width: 276px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #166534, #14532d);
+  color: white;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 100;
+}
+
+.sidebar-header {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-header h1 {
+  font-size: 28px;
+  font-weight: 900;
+  color: white !important;
+}
+
+.sidebar-header p {
+  font-size: 12px;
+  margin-top: 8px;
+  color: #ffffff !important;
+  font-weight: 600;
+  opacity: 1 !important;
+}
+
+.sidebar-welcome {
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent !important;
+}
+
+.sidebar-welcome > div {
+  background: transparent !important;
+}
+
+.sidebar-welcome > div > div {
+  background: transparent !important;
+}
+
+.sidebar-welcome p {
+  background: transparent !important;
+  color: white !important;
+}
+
+.sidebar-welcome * {
+  background: transparent !important;
+}
+
+.sidebar-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.sidebar-menu {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #e5e7eb;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 14px;
+  text-align: left;
+}
+
+.menu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: translateX(4px);
+}
+
+.menu-item.active {
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  color: white;
+  box-shadow: 0 6px 15px rgba(34, 197, 94, 0.4);
+  font-weight: 600;
+}
+
+.menu-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.menu-label {
+  flex: 1;
+}
+
+.sidebar-logout {
+  padding: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.logout-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #ef4444;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.logout-btn:hover {
+  background: #dc2626;
+  box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Dashboard Stat Cards */
+.dashboard-stat-card {
+  @apply bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700;
+  padding: 24px;
+  height: 210px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* Custom Scrollbar Styling */
+/* For webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #059669;
+}
+
+/* District list specific scrollbar */
+.district-list-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.district-list-scroll::-webkit-scrollbar-track {
+  background: #f0fdf4;
+  border-radius: 10px;
+}
+
+.district-list-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #10b981, #059669);
+  border-radius: 10px;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.3);
+}
+
+.district-list-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #059669, #047857);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #10b981 #f1f5f9;
+}
+
+.district-list-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #10b981 #f0fdf4;
+}
+
+.dashboard-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  font-size: 24px;
+  color: white;
+  z-index: 1;
+  position: relative;
+}
+
+/* ===== LOGIN PAGE STYLING ===== */
+
+.login-page {
+  height: 100vh;
+  width: 100%;
+  background: url("https://www.artzolo.com/cdn/shop/files/farmer-artzolo-com.jpg?v=1715690016");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-overlay {
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+  overflow-y: auto;
+  padding: 20px;
+  max-height: 100vh;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 380px;
+  padding: 28px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 0 60px rgba(34, 197, 94, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: slideInUp 0.6s ease-out;
+  position: relative;
+  z-index: 20;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .login-overlay {
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 60px;
+  }
+
+  .login-page {
+    background-attachment: scroll;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-box {
+    max-width: 100%;
+    padding: 24px;
+  }
+
+  .login-overlay {
+    padding: 16px;
+  }
+}
+
+
+.stat-card-icon.green {
+  background: linear-gradient(135deg, #166534 0%, #15803d 100%);
+  box-shadow: 0 4px 12px rgba(22, 101, 52, 0.3);
+}
+
+.stat-card-icon.blue {
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+}
+
+.stat-card-icon.orange {
+  background: linear-gradient(135deg, #b45309 0%, #d97706 100%);
+  box-shadow: 0 4px 12px rgba(180, 83, 9, 0.3);
+}
+
+.stat-card-title {
+  @apply font-semibold text-gray-800 dark:text-gray-200;
+  font-size: 14px;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.5px;
+}
+
+.stat-card-value {
+  @apply font-bold text-gray-900 dark:text-white;
+  font-size: 28px;
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-card-value.status-good {
+  color: #16a34a;
+  font-size: 24px;
+}
+
+.stat-card-desc {
+  @apply text-gray-600 dark:text-gray-400;
+  font-size: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Irrigation Page Layout */
+.irrigation-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.map-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.map-card h2 {
+  @apply text-2xl font-bold text-gray-800 dark:text-white mb-4;
+}
+
+.map-card-inner {
+  height: 420px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #93c5fd;
+  background: #f0f9ff;
+}
+
+.params-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: fadeInUp 0.5s ease-out 0.1s both;
+}
+
+.params-card h2 {
+  @apply text-2xl font-bold text-gray-800 dark:text-white mb-6;
+}
+
+.params-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .params-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .map-card,
+  .params-card {
+    padding: 16px;
+  }
+  
+  .map-card-inner {
+    height: 320px;
+  }
 }

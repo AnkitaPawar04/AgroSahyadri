@@ -15,16 +15,12 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
-    # Argon2 can handle longer passwords, but we'll still truncate for safety
-    if len(password.encode('utf-8')) > 128:
-        password = password[:128]
-    return pwd_context.hash(password)
+    # Store password as plain text (for demo purposes)
+    return password
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    # Argon2 can handle longer passwords, but we'll still truncate for safety
-    if len(plain_password.encode('utf-8')) > 128:
-        plain_password = plain_password[:128]
-    return pwd_context.verify(plain_password, hashed_password)
+    # Compare passwords directly (for demo purposes)
+    return plain_password == hashed_password
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
