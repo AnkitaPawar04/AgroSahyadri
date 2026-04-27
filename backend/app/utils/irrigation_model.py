@@ -8,6 +8,7 @@ Loads pre-trained ML model and provides predictions
 import pickle
 from pathlib import Path
 import numpy as np
+import pandas as pd
 from typing import Dict
 
 class IrrigationModel:
@@ -177,17 +178,17 @@ class IrrigationModel:
             if not features:
                 raise ValueError("No features could be extracted for prediction")
             
-            # Convert to numpy array and reshape
-            features_array = np.array(features).reshape(1, -1)
+            # Convert to pandas DataFrame with feature names (required by model)
+            features_df = pd.DataFrame([features], columns=feature_names)
             
             # Make prediction
-            prediction_numeric = int(self.model.predict(features_array)[0])
+            prediction_numeric = int(self.model.predict(features_df)[0])
             
             # Calculate confidence
             confidence = 75.0
             if hasattr(self.model, 'predict_proba'):
                 try:
-                    probabilities = self.model.predict_proba(features_array)[0]
+                    probabilities = self.model.predict_proba(features_df)[0]
                     confidence = float(max(probabilities) * 100)
                 except:
                     pass

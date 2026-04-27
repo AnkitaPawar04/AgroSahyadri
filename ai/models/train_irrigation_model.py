@@ -20,7 +20,7 @@ warnings.filterwarnings('ignore')
 
 # Set up paths
 CURRENT_DIR = Path(__file__).parent
-DATA_FILE = CURRENT_DIR / "datasets" / "irrigation_prediction.csv"
+DATA_FILE = CURRENT_DIR / "irrigation_prediction.csv"
 OUTPUT_DIR = CURRENT_DIR
 
 print("=" * 70)
