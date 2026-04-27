@@ -79,6 +79,23 @@ npm run build
 npm run preview
 ```
 
+### Credentials for Testing
+
+#### Admin Login
+```
+Email: admin.agro@gmail.com
+Password: Admin@123
+```
+- Access admin dashboard and analytics
+- Manage farmer data
+- View system statistics
+- **Role Selection:** Select "Admin" on login page
+
+#### Farmer Registration
+- Click "Sign Up" on login page
+- Create new account with email and password
+- Access farmer dashboard and features
+
 ---
 
 ## 🔑 Key Features
@@ -100,6 +117,18 @@ npm run preview
 - Firebase integration
 - Token management in localStorage
 - **Files:** `src/pages/LoginPage.jsx`, `src/services/authStorage.js`
+
+#### Admin Credentials
+```
+Email: admin.agro@gmail.com
+Password: Admin@123
+```
+**Note:** Use the "Admin" role selector on the login page to access admin features.
+
+#### Farmer Registration
+- New farmers can register with email/password
+- Phone OTP verification for additional security
+- Farmer dashboard access after login
 
 ### 3. **Dashboard**
 - Farmer dashboard with predictions

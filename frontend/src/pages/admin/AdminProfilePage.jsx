@@ -8,7 +8,7 @@ const AdminProfilePage = () => {
   const [profileData, setProfileData] = useState({
     firstName: 'Admin',
     lastName: 'User',
-    email: 'ankita.pawarr19@gmail.com',
+    email: 'admin.agro@gmail.com',
     phone: '+91 98765 43210',
     organization: 'AgroSahyadri Admin',
     profilePhoto: 'https://ui-avatars.com/api/?name=Admin+User&background=16a34a&color=fff&size=160',

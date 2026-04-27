@@ -1,11 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authAPI } from '../../services/api';
+import { authAPI, adminAPI } from '../../services/api';
 import authStorage from '../../services/authStorage';
 import { getTranslation } from '../../utils/i18n';
 import { AppContext } from '../../contexts/AppContext';
 
-const ADMIN_EMAIL = 'ankita.pawarr19@gmail.com'; // Admin credentials (note: double 'r')
+const ADMIN_EMAIL = 'admin.agro@gmail.com'; // Admin credentials
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -144,7 +144,46 @@ const LoginPage = () => {
       // Use selected role
       const userRole = selectedRole;
 
-      // Login with backend
+      // If admin role selected, use admin login API instead
+      if (userRole === 'admin') {
+        try {
+          console.log('Admin login with email:', email);
+          const response = await adminAPI.adminLogin(email, password);
+          
+          if (!response.data || !response.data.access_token) {
+            throw new Error('Invalid response from server');
+          }
+
+          // Store token and admin flag
+          authStorage.setToken(response.data.access_token);
+          localStorage.setItem('is_admin', 'true');
+          authStorage.setUser({
+            email: email,
+            role: 'admin',
+          });
+
+          console.log('Admin login successful! Redirecting to admin dashboard');
+          navigate('/admin/dashboard');
+          return;
+        } catch (adminError) {
+          console.error('Admin login error:', adminError);
+          
+          let errorMsg = 'Invalid email or password';
+          if (adminError.response?.status === 401) {
+            errorMsg = 'Invalid admin email or password';
+          } else if (adminError.response?.data?.detail) {
+            errorMsg = adminError.response.data.detail;
+          } else if (adminError.message === 'Network Error') {
+            errorMsg = 'Network error: Backend server not responding';
+          }
+          
+          setError(errorMsg);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Login with backend (farmer login)
       try {
         console.log('Logging in with email:', email, 'role:', userRole, 'selectedRole:', selectedRole);
         const response = await authAPI.login(email, password);

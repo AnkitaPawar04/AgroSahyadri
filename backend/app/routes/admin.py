@@ -13,8 +13,8 @@ class AdminLoginRequest(BaseModel):
     password: str
 
 # Hardcoded admin credentials (in production, use a database)
-ADMIN_EMAIL = "ankita.pawarr19@gmail.com"
-ADMIN_PASSWORD = "password123"
+ADMIN_EMAIL = "admin.agro@gmail.com"
+ADMIN_PASSWORD = "Admin@123"
 
 @router.post("/login")
 async def admin_login(request: AdminLoginRequest):

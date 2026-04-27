@@ -28,7 +28,7 @@ const AdminLoginPage = () => {
       
       navigate('/admin/dashboard');
     } catch (err) {
-      setError('Invalid credentials. Use admin@agrosahyadri.com / admin123');
+      setError('Invalid email or password');
       console.error('Admin login error:', err);
     } finally {
       setLoading(false);
@@ -94,8 +94,8 @@ const AdminLoginPage = () => {
 
         <div className="mt-4 text-center text-sm text-gray-600">
           <p>Admin Credentials:</p>
-          <p>Email: ankita.pawarr19@gmail.com</p>
-          <p>Password: password123</p>
+          <p>Email: admin.agro@gmail.com</p>
+          <p>Password: Admin@123</p>
         </div>
       </div>
     </div>
